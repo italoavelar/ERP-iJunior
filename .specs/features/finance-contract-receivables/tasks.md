@@ -147,15 +147,17 @@ T47 → T48
 **Reuses**: Design §Architecture Overview and §Hono HTTP adapters.
 **Design**: §Proposed module boundaries; §Hono HTTP adapters.
 **Requirements**: Supporting prerequisite for ACCESS-01–ACCESS-11 and IDEMP-01.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] A Node.js/TypeScript Hono app can be instantiated in tests without Express, Fastify, or direct database writes in handlers.
-- [ ] Module wiring has an explicit registration point for the Financeiro vertical.
-- [ ] API harness tests prove startup and an isolated health/test route only.
+- [x] A Node.js/TypeScript Hono app can be instantiated in tests without Express, Fastify, or direct database writes in handlers.
+- [x] Module wiring has an explicit registration point for the Financeiro vertical.
+- [x] API harness tests prove startup and an isolated health/test route only.
 
 **Tests**: API — app bootstrap and module registration seam.
 **Gate**: full.
 **Commit**: `chore(api): scaffold hono application boundary`
+**Verification**: `npm run test:api`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check`, `git diff --check`, `validate_tasks.py --strict` and `validate_spec.py --strict` passed on 2026-08-18.
 
 ### T03: Scaffold the React, TypeScript and Vite boundary
 

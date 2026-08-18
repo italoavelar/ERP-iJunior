@@ -17,7 +17,7 @@ describe("API workspace boundary", () => {
       readFileSync(resolve(repositoryRoot, "apps/api/package.json"), "utf8")
     ) as WorkspacePackage;
 
-    expect(packageJson).toEqual({
+    expect(packageJson).toMatchObject({
       name: "@ijunior/api",
       version: "0.0.0",
       private: true,

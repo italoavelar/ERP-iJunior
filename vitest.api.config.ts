@@ -5,7 +5,7 @@ export default defineConfig({
     environment: "node",
     include: [
       "tests/foundation/**/*.api.test.ts",
-      "apps/api/src/modules/finance-contract-receivables/http/__tests__/*.api.test.ts"
+      "apps/api/src/**/*.api.test.ts"
     ]
   }
 });

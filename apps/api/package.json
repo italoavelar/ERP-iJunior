@@ -2,5 +2,13 @@
   "name": "@ijunior/api",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test:api": "vitest run --config ../../vitest.api.config.ts"
+  },
+  "dependencies": {
+    "hono": "^4.13.3"
+  }
 }
