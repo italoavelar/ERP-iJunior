@@ -117,10 +117,10 @@
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
-- **Phase / Task**: Design revisado tecnicamente; aguardando aprovação do usuário antes de Tasks
-- **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização
-- **In-progress** (file:line): `.specs/features/finance-contract-receivables/design.md:1` — aprovação de design pelo usuário
-- **Next step**: Revisar ou aprovar `design.md`; não criar tasks nem código antes da aprovação.
+- **Phase / Task**: Tasks elaboradas e validadas; aguardando aprovação do usuário, sem implementação
+- **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização; `tasks.md` possui 48 tasks, matriz de testes, dependências sem ciclos e cobertura dos 71 requisitos
+- **In-progress** (file:line): `.specs/features/finance-contract-receivables/tasks.md:1` — aprovação do plano de implementação
+- **Next step**: Revisar ou aprovar `tasks.md`; não implementar código, migrations ou inicialização de stack antes da aprovação das Tasks.
 - **Blockers**: none
 - **Uncommitted files**: `.specs/features/finance-contract-receivables/spec.md`, `.specs/features/finance-contract-receivables/design.md` e `.specs/STATE.md`
 - **Branch**: main

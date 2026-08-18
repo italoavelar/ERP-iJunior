@@ -1,7 +1,7 @@
 # Finance Contract Receivables Design
 
 **Spec:** .specs/features/finance-contract-receivables/spec.md
-**Status:** Draft — ready for design review; tasks and implementation remain blocked.
+**Status:** Approved — Tasks phase authorized; implementation remains blocked until Tasks approval.
 **Scope:** Only the first Financeiro vertical for PaymentPlan, Installment, receipt allocations, reversals, derived balance, authorization, audit, and idempotency.
 
 ## Design Constraints and Non-goals
