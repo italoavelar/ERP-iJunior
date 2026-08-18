@@ -167,15 +167,17 @@ T47 → T48
 **Reuses**: Design §Frontend Design.
 **Design**: §Proposed module boundaries; §Frontend Design.
 **Requirements**: Supporting prerequisite for ACCESS-01, ACCESS-02 and IDEMP-01–IDEMP-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] React, TypeScript and Vite are the only frontend framework/toolchain selected.
-- [ ] The feature can be mounted in a component test without connecting to a live backend.
-- [ ] Shared build and test scripts pass.
+- [x] React, TypeScript and Vite are the only frontend framework/toolchain selected.
+- [x] The feature can be mounted in a component test without connecting to a live backend.
+- [x] Shared build and test scripts pass.
 
 **Tests**: frontend — application-shell render test.
 **Gate**: full.
 **Commit**: `chore(web): scaffold vite react application boundary`
+**Verification**: `npm run test:web`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check`, `git diff --check`, `validate_tasks.py --strict` and `validate_spec.py --strict` passed on 2026-08-18.
 
 ### T04: Configure Prisma and isolated PostgreSQL integration testing
 
