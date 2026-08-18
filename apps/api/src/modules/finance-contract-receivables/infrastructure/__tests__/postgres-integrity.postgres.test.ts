@@ -23,6 +23,10 @@ describe("PostgreSQL finance migrations and guards", () => {
     const contractId = unique("contract");
     await plan(contractId);
     await expect(plan(contractId)).rejects.toThrow();
+    const racedContractId = unique("raced-contract");
+    const race = await Promise.allSettled([plan(racedContractId), secondPrisma.paymentPlan.create({ data: { contractId: racedContractId, clientId: unique("client"), totalCents: 1000n } })]);
+    expect(race.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    expect(race.filter((result) => result.status === "rejected")).toHaveLength(1);
     await expect(prisma.paymentPlan.create({ data: { contractId: unique("bad"), clientId: unique("client"), totalCents: 0n } })).rejects.toThrow();
     const paymentPlan = await plan();
     await expect(prisma.paymentPlan.update({ where: { id: paymentPlan.id }, data: { totalCents: 1100n } })).resolves.toBeDefined();

@@ -13,3 +13,14 @@ export class FixtureContractReferencePort implements ContractReferencePort {
     return this.contexts.get(contractId) ?? { kind: "unavailable-or-ineligible" };
   }
 }
+
+/** Reusable contract-owner outcomes; unavailable covers both ineligible and non-BRL owner responses. */
+export const contractReferenceFixtures = {
+  unavailable: { kind: "unavailable-or-ineligible" } as const,
+  ineligible: { kind: "unavailable-or-ineligible" } as const,
+  nonBrl: { kind: "unavailable-or-ineligible" } as const,
+  valid: {
+    kind: "available", contractId: "contract-valid", clientId: "client-valid", currency: "BRL",
+    financialValue: MoneyBRL.parse("100.00"), eligibleForReceivables: true
+  } as const
+};
