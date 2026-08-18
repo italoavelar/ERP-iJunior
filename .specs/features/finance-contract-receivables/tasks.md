@@ -127,15 +127,17 @@ T47 → T48
 **Reuses**: Approved stack and Design §Architecture Overview.
 **Design**: §Architecture Overview; §Proposed module boundaries.
 **Requirements**: Supporting prerequisite for all 71 requirements; no standalone product acceptance criterion.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] The workspace contains planned API, web and Prisma package boundaries without an ERP-wide scaffold.
-- [ ] `lint`, `typecheck`, `test:unit`, `test:integration`, `test:api`, `test:web`, and `check` have explicit, non-skipping definitions.
-- [ ] Environment documentation distinguishes local PostgreSQL from the isolated integration-test database and contains no credentials.
+- [x] The workspace contains planned API, web and Prisma package boundaries without an ERP-wide scaffold.
+- [x] `lint`, `typecheck`, `test:unit`, `test:integration`, `test:api`, `test:web`, and `check` have explicit, non-skipping definitions.
+- [x] Environment documentation distinguishes local PostgreSQL from the isolated integration-test database and contains no credentials.
 
 **Tests**: integration — bootstrap command verification.
 **Gate**: build — `npm run check` exits successfully after the task's own minimal harness is present.
 **Commit**: `chore(workspace): define receivables quality commands`
+**Verification**: `npm run build`, `npm run check`, the four test-suite commands, `validate_tasks.py --strict`, and `validate_spec.py --strict` passed on 2026-08-18.
 
 ### T02: Scaffold the TypeScript Hono API boundary
 
