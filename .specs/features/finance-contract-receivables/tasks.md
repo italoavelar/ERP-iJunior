@@ -187,11 +187,12 @@ T47 → T48
 **Reuses**: Design §Proposed Prisma / PostgreSQL Model.
 **Design**: §Proposed module boundaries; §Atomicity and Concurrency.
 **Requirements**: EDGE-02; supporting prerequisite for PLAN-02, RECEIPT-06–RECEIPT-07, REVERSE-03 and IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Prisma connects only to PostgreSQL and integration tests target a disposable, explicitly configured test database.
-- [ ] Test setup can apply migrations and clean test data without touching a developer/production database.
-- [ ] A transaction rollback smoke test runs against real PostgreSQL.
+- [x] Prisma connects only to PostgreSQL and integration tests target a disposable, explicitly configured test database.
+- [x] Test setup can apply migrations and clean test data without touching a developer/production database.
+- [x] A transaction rollback smoke test runs against real PostgreSQL.
 
 **Tests**: integration — PostgreSQL connection, migration lifecycle and rollback smoke test.
 **Gate**: build.
@@ -207,11 +208,12 @@ T47 → T48
 **Reuses**: Design §Exact BRL value object and §Monetary wire contract.
 **Design**: §Exact BRL value object; §Monetary wire contract.
 **Requirements**: INST-02, RECEIPT-02–RECEIPT-04, REVERSE-03–REVERSE-04, EDGE-01.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Decimal strings parse to centavos with no `Number`, `parseFloat`, or binary floating-point arithmetic.
-- [ ] Values with more than two decimals, scientific notation, whitespace, negatives where not allowed, zero for positive-only values, and values beyond signed BIGINT are rejected.
-- [ ] Addition, subtraction, comparison, exact equality and two-decimal API formatting use `bigint` only.
+- [x] Decimal strings parse to centavos with no `Number`, `parseFloat`, or binary floating-point arithmetic.
+- [x] Values with more than two decimals, scientific notation, whitespace, negatives where not allowed, zero for positive-only values, and values beyond signed BIGINT are rejected.
+- [x] Addition, subtraction, comparison, exact equality and two-decimal API formatting use `bigint` only.
 
 **Tests**: unit — parser grammar, R$0,01 minimum, BIGINT bounds and arithmetic branches.
 **Gate**: quick.
@@ -225,11 +227,12 @@ T47 → T48
 **Reuses**: Design §Calendar and timestamp value objects.
 **Design**: §Calendar and timestamp value objects; §Derived Financial Projection.
 **Requirements**: INST-03, RECEIPT-12–RECEIPT-14, REVERSE-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] LocalDate accepts calendar dates only and rejects timestamps/timezones as due dates.
-- [ ] Tests use a deterministic Clock rather than the host clock.
-- [ ] The due date itself is NOT_DUE; the next São Paulo calendar day with balance is OVERDUE.
+- [x] LocalDate accepts calendar dates only and rejects timestamps/timezones as due dates.
+- [x] Tests use a deterministic Clock rather than the host clock.
+- [x] The due date itself is NOT_DUE; the next São Paulo calendar day with balance is OVERDUE.
 
 **Tests**: unit — parsing and deterministic due-date boundary tests.
 **Gate**: quick.
@@ -243,11 +246,12 @@ T47 → T48
 **Reuses**: MoneyBRL and LocalDate from T05–T06.
 **Design**: §Financial policies; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-03, PLAN-08, PLAN-10, INST-07–INST-09, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Policies distinguish DRAFT/ACTIVE without introducing a third state.
-- [ ] Financial history is an existence fact, not a balance-derived condition; reversal cannot thaw a plan.
-- [ ] Structural and descriptive mutation rules match the closed scope, including no descriptive endpoint in v1.
+- [x] Policies distinguish DRAFT/ACTIVE without introducing a third state.
+- [x] Financial history is an existence fact, not a balance-derived condition; reversal cannot thaw a plan.
+- [x] Structural and descriptive mutation rules match the closed scope, including no descriptive endpoint in v1.
 
 **Tests**: unit — lifecycle, direct-ACTIVE edit and permanent-freeze branches.
 **Gate**: quick.
@@ -261,11 +265,12 @@ T47 → T48
 **Reuses**: MoneyBRL, LocalDate and Clock.
 **Design**: §Derived Financial Projection.
 **Requirements**: RECEIPT-08, RECEIPT-09, RECEIPT-10, RECEIPT-11, RECEIPT-12, RECEIPT-13, RECEIPT-14, REVERSE-06–REVERSE-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] No derived amount or status is modeled as a writable command value.
-- [ ] PENDING, PARTIAL and SETTLED follow exact net allocation boundaries.
-- [ ] A post-due reversal restoring balance immediately yields OVERDUE.
+- [x] No derived amount or status is modeled as a writable command value.
+- [x] PENDING, PARTIAL and SETTLED follow exact net allocation boundaries.
+- [x] A post-due reversal restoring balance immediately yields OVERDUE.
 
 **Tests**: unit — receipt/reversal netting, all settlement states and due-status precedence.
 **Gate**: quick.
@@ -279,11 +284,12 @@ T47 → T48
 **Reuses**: Design §Proposed Prisma / PostgreSQL Model.
 **Design**: §Proposed Prisma / PostgreSQL Model; §Entity fields, relationships, and indexes.
 **Requirements**: PLAN-01–PLAN-02, INST-01, RECEIPT-01, REVERSE-01–REVERSE-02, IDEMP-02, ACCESS-08–ACCESS-09.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] PaymentPlan, Installment, FinancialTransaction, TransactionAllocation, IdempotencyRecord and AuditEvent have the designed identities, relations and indexes.
-- [ ] Contract, Client and User remain scalar canonical references; no duplicate owner tables or personal-data snapshots are added.
-- [ ] Prisma validation and generated client pass before raw SQL guarantees are layered on.
+- [x] PaymentPlan, Installment, FinancialTransaction, TransactionAllocation, IdempotencyRecord and AuditEvent have the designed identities, relations and indexes.
+- [x] Contract, Client and User remain scalar canonical references; no duplicate owner tables or personal-data snapshots are added.
+- [x] Prisma validation and generated client pass before raw SQL guarantees are layered on.
 
 **Tests**: integration — generated schema can create and query each relation using PostgreSQL.
 **Gate**: build.
@@ -297,11 +303,12 @@ T47 → T48
 **Reuses**: Prisma model from T09 and MoneyBRL bounds from T05.
 **Design**: §Database-enforced invariants.
 **Requirements**: PLAN-01–PLAN-02, INST-02, RECEIPT-01–RECEIPT-04, REVERSE-01–REVERSE-04, EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] `payment_plan_one_live_contract` permits a new plan only after a discarded marker and rejects two live rows even under concurrent inserts.
-- [ ] Database checks reject non-BRL and nonpositive persisted monetary values and invalid RECEIPT/REVERSAL origin nullability.
-- [ ] Application can recognize the partial-index conflict as a typed domain conflict.
+- [x] `payment_plan_one_live_contract` permits a new plan only after a discarded marker and rejects two live rows even under concurrent inserts.
+- [x] Database checks reject non-BRL and nonpositive persisted monetary values and invalid RECEIPT/REVERSAL origin nullability.
+- [x] Application can recognize the partial-index conflict as a typed domain conflict.
 
 **Tests**: integration — migration constraints and two-key concurrent create-plan race.
 **Gate**: full.
@@ -315,11 +322,12 @@ T47 → T48
 **Reuses**: Schema relations from T09.
 **Design**: §Database-enforced invariants; §Receipt and Reversal Model.
 **Requirements**: RECEIPT-05, REVERSE-01–REVERSE-05, REVERSE-09, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] The deferred trigger rejects allocations whose transaction and installment belong to different plans.
-- [ ] It enforces receipt-vs-reversal allocation shape and reversal links only to an allocation of the parent original RECEIPT.
-- [ ] Valid multi-allocation receipt and reversal fixtures commit successfully.
+- [x] The deferred trigger rejects allocations whose transaction and installment belong to different plans.
+- [x] It enforces receipt-vs-reversal allocation shape and reversal links only to an allocation of the parent original RECEIPT.
+- [x] Valid multi-allocation receipt and reversal fixtures commit successfully.
 
 **Tests**: integration — direct invalid SQL/Prisma writes fail at commit; valid ledger graphs commit.
 **Gate**: full.
@@ -333,11 +341,12 @@ T47 → T48
 **Reuses**: Lifecycle policy from T07 and schema from T09.
 **Design**: §Database-enforced invariants; §History presence and permanent freeze.
 **Requirements**: PLAN-10–PLAN-12, INST-07–INST-09, ACCESS-09, EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Contract, Client and currency references are write-once after creation.
-- [ ] Any FinancialTransaction history blocks structural plan/installment changes and deletion, even after full reversal.
-- [ ] A DRAFT plan without history remains editable and discardable by the application policy.
+- [x] Contract, Client and currency references are write-once after creation.
+- [x] Any FinancialTransaction history blocks structural plan/installment changes and deletion, even after full reversal.
+- [x] A DRAFT plan without history remains editable and discardable by the application policy.
 
 **Tests**: integration — direct post-history update/delete attempts fail while pre-history draft changes succeed.
 **Gate**: full.
@@ -351,11 +360,12 @@ T47 → T48
 **Reuses**: Schema from T09 and transactional audit design.
 **Design**: §Database-enforced invariants; §Audit writer.
 **Requirements**: REVERSE-09, IDEMP-08, ACCESS-07, ACCESS-09.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] UPDATE and DELETE of persisted ledger facts and AuditEvent fail at database level.
-- [ ] Valid inserts remain possible only inside the application transaction path.
-- [ ] No retention, purge or restoration mechanism is added.
+- [x] UPDATE and DELETE of persisted ledger facts and AuditEvent fail at database level.
+- [x] Valid inserts remain possible only inside the application transaction path.
+- [x] No retention, purge or restoration mechanism is added.
 
 **Tests**: integration — append succeeds; each prohibited UPDATE/DELETE fails in PostgreSQL.
 **Gate**: full.
@@ -371,11 +381,12 @@ T47 → T48
 **Reuses**: Design §References owned outside this vertical.
 **Design**: §Domain Model and Ownership; §ContractReferencePort.
 **Requirements**: EDGE-01, ACCESS-08, ACCESS-10–ACCESS-11.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] The port exposes only canonical Contract ID, Client ID, BRL value/currency and eligibility; it cannot mutate Contract or Client.
-- [ ] Fixtures cover unavailable, ineligible, non-BRL and valid Contract contexts without CRM implementation.
-- [ ] No fixture copies CPF/CNPJ, name, address or other personal data into Financeiro records.
+- [x] The port exposes only canonical Contract ID, Client ID, BRL value/currency and eligibility; it cannot mutate Contract or Client.
+- [x] Fixtures cover unavailable, ineligible, non-BRL and valid Contract contexts without CRM implementation.
+- [x] No fixture copies CPF/CNPJ, name, address or other personal data into Financeiro records.
 
 **Tests**: integration — port-contract tests and reusable canonical-ID fixtures.
 **Gate**: full.
@@ -389,11 +400,12 @@ T47 → T48
 **Reuses**: Design §Authorization port.
 **Design**: §Authorization port.
 **Requirements**: ACCESS-03–ACCESS-06, ACCESS-10–ACCESS-11, IDEMP-05.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Finance use cases receive an authenticated actor context rather than request-supplied actor/role/capability fields.
-- [ ] Gerente Financeiro and Vice-Presidente grants match the closed matrix exactly.
-- [ ] PLATFORM_ADMIN alone has no FinanceCapability, and no role string is evaluated in Financeiro authorization logic.
+- [x] Finance use cases receive an authenticated actor context rather than request-supplied actor/role/capability fields.
+- [x] Gerente Financeiro and Vice-Presidente grants match the closed matrix exactly.
+- [x] PLATFORM_ADMIN alone has no FinanceCapability, and no role string is evaluated in Financeiro authorization logic.
 
 **Tests**: integration — every granted/denied capability, including PLATFORM_ADMIN-only and elevated-action cases.
 **Gate**: full.
@@ -407,11 +419,12 @@ T47 → T48
 **Reuses**: Design §Common Unit of Work protocol and §Locking strategy and retry.
 **Design**: §Atomicity and Concurrency.
 **Requirements**: PLAN-05, RECEIPT-06–RECEIPT-07, REVERSE-03, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Every existing-plan mutation locks exactly its PaymentPlan with parameterized `SELECT ... FOR UPDATE` before reading mutable state.
-- [ ] Raw SQL is limited to the approved lock/query use; no user-controlled SQL identifier interpolation is possible.
-- [ ] SQLSTATE 40P01/40001 is retried at most twice, while domain/authorization/idempotency conflicts are not retried.
+- [x] Every existing-plan mutation locks exactly its PaymentPlan with parameterized `SELECT ... FOR UPDATE` before reading mutable state.
+- [x] Raw SQL is limited to the approved lock/query use; no user-controlled SQL identifier interpolation is possible.
+- [x] SQLSTATE 40P01/40001 is retried at most twice, while domain/authorization/idempotency conflicts are not retried.
 
 **Tests**: integration — lock acquisition, rollback and bounded-retry mapping against PostgreSQL.
 **Gate**: full.
@@ -425,11 +438,12 @@ T47 → T48
 **Reuses**: AuditEvent schema and append-only trigger from T09/T13.
 **Design**: §Audit writer; §Critical operation transactions.
 **Requirements**: PLAN-09, PLAN-11, RECEIPT-15, REVERSE-08, ACCESS-07, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] AuditEvent writes use the supplied Prisma transaction client, never an HTTP call, queue or post-commit action.
-- [ ] Each approved action has minimal non-PII context, actor, timestamp, references and required reason.
-- [ ] An injected AuditWriter failure rolls back the domain change and any IdempotencyRecord.
+- [x] AuditEvent writes use the supplied Prisma transaction client, never an HTTP call, queue or post-commit action.
+- [x] Each approved action has minimal non-PII context, actor, timestamp, references and required reason.
+- [x] An injected AuditWriter failure rolls back the domain change and any IdempotencyRecord.
 
 **Tests**: integration — all audit action shapes and a forced audit-write failure proving zero committed financial effects.
 **Gate**: full.
@@ -443,11 +457,12 @@ T47 → T48
 **Reuses**: MoneyBRL and LocalDate canonical representations.
 **Design**: §Idempotency Design; §Canonical fingerprint and result.
 **Requirements**: IDEMP-01–IDEMP-04, IDEMP-06.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Canonical parameters include command, actor-independent request semantics, target IDs, normalized money/date values and deterministic allocation ordering.
-- [ ] The fingerprint never serializes bigint as JSON or relies on object insertion order.
-- [ ] Different material parameters always produce a different conflict comparison input.
+- [x] Canonical parameters include command, actor-independent request semantics, target IDs, normalized money/date values and deterministic allocation ordering.
+- [x] The fingerprint never serializes bigint as JSON or relies on object insertion order.
+- [x] Different material parameters always produce a different conflict comparison input.
 
 **Tests**: unit — equivalent ordering/format normalization and command/actor/payload conflict cases.
 **Gate**: quick.
@@ -461,11 +476,12 @@ T47 → T48
 **Reuses**: IdempotencyRecord schema and Unit of Work.
 **Design**: §Idempotency Design; §Common Unit of Work protocol.
 **Requirements**: IDEMP-01–IDEMP-08, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] A completed key stores command, actor, canonical parameters/fingerprint and sanitized original result atomically with the command.
-- [ ] Same actor/command/fingerprint replays the persisted result without another fact or audit; changed actor/command/payload conflicts.
-- [ ] Two real PostgreSQL connections using one key produce at most one effect; failure before commit leaves no completed record.
+- [x] A completed key stores command, actor, canonical parameters/fingerprint and sanitized original result atomically with the command.
+- [x] Same actor/command/fingerprint replays the persisted result without another fact or audit; changed actor/command/payload conflicts.
+- [x] Two real PostgreSQL connections using one key produce at most one effect; failure before commit leaves no completed record.
 
 **Tests**: integration — same-key concurrent instances, failure-before-commit, replay after simulated lost response, conflict and retention-without-purge cases.
 **Gate**: full.
