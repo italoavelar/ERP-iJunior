@@ -17,17 +17,23 @@
     "typecheck": "tsc --noEmit --project tsconfig.json && npm run typecheck --workspace=@ijunior/api && npm run typecheck --workspace=@ijunior/web",
     "test": "npm run test:unit && npm run test:integration && npm run test:api && npm run test:web",
     "test:unit": "vitest run --config vitest.unit.config.ts",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration": "tsx scripts/postgres-test-harness.ts test",
     "test:api": "vitest run --config vitest.api.config.ts",
     "test:web": "vitest run --config vitest.web.config.ts",
+    "db:generate": "prisma generate",
+    "db:migrate:test": "tsx scripts/postgres-test-harness.ts migrate",
+    "db:test": "tsx scripts/postgres-test-harness.ts test",
     "check": "npm run lint && npm run typecheck && npm run test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@prisma/client": "6.19.2",
     "@types/node": "^22.20.1",
     "eslint": "^10.8.1",
     "globals": "^17.11.0",
     "typescript": "^6.0.3",
+    "prisma": "6.19.2",
+    "tsx": "^4.20.6",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.11"
   }

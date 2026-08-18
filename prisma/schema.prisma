@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentPlanStatus {
+  DRAFT
+  ACTIVE
+}
+
+enum FinancialTransactionType {
+  RECEIPT
+  REVERSAL
+}
+
+enum CurrencyCode {
+  BRL
+}
+
+model PaymentPlan {
+  id            String            @id @default(uuid()) @db.Uuid
+  contractId    String            @db.VarChar(128)
+  clientId      String            @db.VarChar(128)
+  currency      CurrencyCode      @default(BRL)
+  totalCents    BigInt            @db.BigInt
+  status        PaymentPlanStatus @default(DRAFT)
+  discardedAt   DateTime?         @db.Timestamptz(6)
+  discardedById String?           @db.VarChar(128)
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime          @updatedAt @db.Timestamptz(6)
+
+  installments  Installment[]
+  transactions  FinancialTransaction[]
+
+  @@index([contractId, discardedAt])
+  @@index([clientId])
+}
+
+model Installment {
+  id                String                  @id @default(uuid()) @db.Uuid
+  paymentPlanId     String                  @db.Uuid
+  installmentNumber Int
+  originalCents     BigInt                  @db.BigInt
+  dueDate           DateTime                @db.Date
+  createdAt         DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime                @updatedAt @db.Timestamptz(6)
+
+  paymentPlan       PaymentPlan             @relation(fields: [paymentPlanId], references: [id], onDelete: Restrict)
+  allocations       TransactionAllocation[]
+
+  @@unique([paymentPlanId, installmentNumber])
+  @@index([paymentPlanId, dueDate])
+}
+
+model FinancialTransaction {
+  id                String                   @id @default(uuid()) @db.Uuid
+  paymentPlanId     String                   @db.Uuid
+  type              FinancialTransactionType
+  amountCents       BigInt                   @db.BigInt
+  occurredAt        DateTime                 @default(now()) @db.Timestamptz(6)
+  actorUserId       String                   @db.VarChar(128)
+  reason            String?                  @db.Text
+  originalReceiptId String?                  @db.Uuid
+
+  paymentPlan       PaymentPlan              @relation(fields: [paymentPlanId], references: [id], onDelete: Restrict)
+  originalReceipt   FinancialTransaction?    @relation("ReceiptReversals", fields: [originalReceiptId], references: [id], onDelete: Restrict)
+  reversals         FinancialTransaction[]   @relation("ReceiptReversals")
+  allocations       TransactionAllocation[]
+
+  @@index([paymentPlanId, occurredAt])
+  @@index([originalReceiptId])
+}
+
+model TransactionAllocation {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  transactionId        String                  @db.Uuid
+  installmentId        String                  @db.Uuid
+  amountCents          BigInt                  @db.BigInt
+  originalAllocationId String?                 @db.Uuid
+  createdAt            DateTime                @default(now()) @db.Timestamptz(6)
+
+  transaction          FinancialTransaction    @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  installment          Installment             @relation(fields: [installmentId], references: [id], onDelete: Restrict)
+  originalAllocation   TransactionAllocation?  @relation("AllocationReversals", fields: [originalAllocationId], references: [id], onDelete: Restrict)
+  reversalAllocations  TransactionAllocation[] @relation("AllocationReversals")
+
+  @@index([transactionId])
+  @@index([installmentId])
+  @@index([originalAllocationId])
+}
+
+model IdempotencyRecord {
+  id                 String   @id @default(uuid()) @db.Uuid
+  key                String   @unique @db.VarChar(128)
+  commandType        String   @db.VarChar(96)
+  actorUserId        String   @db.VarChar(128)
+  semanticParameters Json
+  requestFingerprint String   @db.Char(64)
+  resultType         String   @db.VarChar(64)
+  resultId           String   @db.VarChar(128)
+  resultPayload      Json
+  completedAt        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([actorUserId, commandType])
+}
+
+model AuditEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  domain        String   @db.VarChar(64)
+  action        String   @db.VarChar(96)
+  aggregateType String   @db.VarChar(64)
+  aggregateId   String   @db.VarChar(128)
+  contractId    String?  @db.VarChar(128)
+  paymentPlanId String?  @db.Uuid
+  transactionId String?  @db.Uuid
+  actorUserId   String   @db.VarChar(128)
+  reason        String?  @db.Text
+  context       Json
+  occurredAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([contractId, occurredAt])
+  @@index([paymentPlanId, occurredAt])
+  @@index([transactionId])
+}

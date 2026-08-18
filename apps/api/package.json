@@ -9,6 +9,7 @@
     "test:api": "vitest run --config ../../vitest.api.config.ts"
   },
   "dependencies": {
+    "@prisma/client": "6.19.2",
     "hono": "^4.13.3"
   }
 }
