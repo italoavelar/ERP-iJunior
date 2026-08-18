@@ -117,10 +117,10 @@
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
-- **Phase / Task**: Specify concluído; aguardando autorização para Design
-- **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito
-- **In-progress** (file:line): none
-- **Next step**: Aguardar autorização do usuário para criar `design.md`; não criar tasks nem código antes disso.
+- **Phase / Task**: Design revisado tecnicamente; aguardando aprovação do usuário antes de Tasks
+- **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização
+- **In-progress** (file:line): `.specs/features/finance-contract-receivables/design.md:1` — aprovação de design pelo usuário
+- **Next step**: Revisar ou aprovar `design.md`; não criar tasks nem código antes da aprovação.
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/finance-contract-receivables/spec.md` e `.specs/STATE.md`
+- **Uncommitted files**: `.specs/features/finance-contract-receivables/spec.md`, `.specs/features/finance-contract-receivables/design.md` e `.specs/STATE.md`
 - **Branch**: main
