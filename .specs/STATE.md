@@ -116,11 +116,11 @@
 
 ## Handoff
 
-- **Feature**: Contexto global de produto, sem feature criada
-- **Phase / Task**: Correções pós-review de domínio
-- **Completed**: Ownership, entidades comerciais first-class, grafo contratual, assinatura como handoff, preparação de projeto, financeiro por referência, privilégios e pendências consolidados
+- **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
+- **Phase / Task**: Specify concluído; aguardando autorização para Design
+- **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito
 - **In-progress** (file:line): none
-- **Next step**: Escolher a primeira feature e resolver somente as pendências que a bloqueiam antes de especificá-la.
-- **Blockers**: Decisões de produto listadas em `docs/product/pendencias-de-definicao.md`.
-- **Uncommitted files**: `docs/product/` e `.specs/STATE.md`
+- **Next step**: Aguardar autorização do usuário para criar `design.md`; não criar tasks nem código antes disso.
+- **Blockers**: none
+- **Uncommitted files**: `.specs/features/finance-contract-receivables/spec.md` e `.specs/STATE.md`
 - **Branch**: main
