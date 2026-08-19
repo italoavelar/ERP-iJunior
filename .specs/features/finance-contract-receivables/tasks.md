@@ -497,11 +497,12 @@ T47 → T48
 **Reuses**: ContractReferencePort, Unit of Work, AuditWriter and IdempotencyStore.
 **Design**: §Financial command use cases; §Critical operation transactions.
 **Requirements**: PLAN-01–PLAN-02, ACCESS-03, ACCESS-05, ACCESS-07–ACCESS-08, IDEMP-01–IDEMP-07, EDGE-01–EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] The command creates only a BRL DRAFT plan with canonical Contract/Client references and the Contract financial value as operational total.
-- [ ] Two distinct idempotency keys racing to create a live plan for one Contract yield one success and `PAYMENT_PLAN_ALREADY_EXISTS`, never an internal Prisma error.
-- [ ] Effect, creation audit and idempotency result share one transaction.
+- [x] The command creates only a BRL DRAFT plan with canonical Contract/Client references and the Contract financial value as operational total.
+- [x] Two distinct idempotency keys racing to create a live plan for one Contract yield one success and `PAYMENT_PLAN_ALREADY_EXISTS`, never an internal Prisma error.
+- [x] Effect, creation audit and idempotency result share one transaction.
 
 **Tests**: integration — valid/unavailable/ineligible contract, authorization, replay and real partial-index create race.
 **Gate**: full.
@@ -515,11 +516,12 @@ T47 → T48
 **Reuses**: PaymentPlan lifecycle policy and idempotent Unit of Work.
 **Design**: §Financial command use cases; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-03, INST-07–INST-09, ACCESS-03, ACCESS-05, ACCESS-07, IDEMP-01–IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Only an editable, non-discarded DRAFT plan can change totalCents.
-- [ ] The use case locks the plan, records one audit event and returns replay safely.
-- [ ] It rejects post-history, ACTIVE and reference-replacement attempts without writes.
+- [x] Only an editable, non-discarded DRAFT plan can change totalCents.
+- [x] The use case locks the plan, records one audit event and returns replay safely.
+- [x] It rejects post-history, ACTIVE and reference-replacement attempts without writes.
 
 **Tests**: integration — allowed DRAFT update, forbidden state/history/reference cases and replay.
 **Gate**: full.
@@ -533,11 +535,12 @@ T47 → T48
 **Reuses**: MoneyBRL, LocalDate, lifecycle policy and locked Unit of Work.
 **Design**: §Financial command use cases; §PaymentPlan and Installment Lifecycle.
 **Requirements**: INST-01–INST-04, INST-06–INST-09, ACCESS-03, ACCESS-05, ACCESS-07, IDEMP-01–IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Stable entity identity is generated independently of number, date and amount.
-- [ ] The next positive unique number is suggested; duplicate requested numbers conflict atomically.
-- [ ] Same due dates are accepted while monetary/date validation remains exact.
+- [x] Stable entity identity is generated independently of number, date and amount.
+- [x] The next positive unique number is suggested; duplicate requested numbers conflict atomically.
+- [x] Same due dates are accepted while monetary/date validation remains exact.
 
 **Tests**: integration — suggested/explicit number, same-date installments, invalid money/date/state/history and replay.
 **Gate**: full.
@@ -551,11 +554,12 @@ T47 → T48
 **Reuses**: Lifecycle policy, MoneyBRL, LocalDate and AuditWriter.
 **Design**: §Financial command use cases; §PaymentPlan and Installment Lifecycle.
 **Requirements**: INST-02–INST-03, INST-05, INST-07–INST-09, ACCESS-03, ACCESS-05, ACCESS-07, IDEMP-01–IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] A valid DRAFT edit changes only original amount and/or due date.
-- [ ] It never changes identity/number or permits active/history structural mutation.
-- [ ] It atomically persists audit and idempotency evidence.
+- [x] A valid DRAFT edit changes only original amount and/or due date.
+- [x] It never changes identity/number or permits active/history structural mutation.
+- [x] It atomically persists audit and idempotency evidence.
 
 **Tests**: integration — identity preservation, money/date failures, DRAFT-only behavior, freeze and replay.
 **Gate**: full.
@@ -569,11 +573,12 @@ T47 → T48
 **Reuses**: Lifecycle policy, Unit of Work and AuditWriter.
 **Design**: §Financial command use cases; §PaymentPlan and Installment Lifecycle.
 **Requirements**: INST-05, INST-07–INST-09, ACCESS-03, ACCESS-05, ACCESS-07, ACCESS-09, IDEMP-01–IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Only a DRAFT plan without history permits removal.
-- [ ] Removal does not renumber surviving installments implicitly.
-- [ ] Database restrictions and use-case policy reject historical ledger deletion.
+- [x] Only a DRAFT plan without history permits removal.
+- [x] Removal does not renumber surviving installments implicitly.
+- [x] Database restrictions and use-case policy reject historical ledger deletion.
 
 **Tests**: integration — DRAFT removal, ACTIVE/history rejection, audit/idempotency replay and database guard coverage.
 **Gate**: full.
@@ -587,11 +592,12 @@ T47 → T48
 **Reuses**: Stable installment IDs, lifecycle policy and locked Unit of Work.
 **Design**: §Financial command use cases; §PaymentPlan and Installment Lifecycle.
 **Requirements**: INST-04–INST-05, INST-07–INST-11, ACCESS-03, ACCESS-05, ACCESS-07, IDEMP-01–IDEMP-07.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] The requested list contains every current installment exactly once; only its order determines resulting 1..N numbers.
-- [ ] Stable IDs survive renumbering and no activation command performs this action implicitly.
-- [ ] ACTIVE/history plans reject reordering atomically.
+- [x] The requested list contains every current installment exactly once; only its order determines resulting 1..N numbers.
+- [x] Stable IDs survive renumbering and no activation command performs this action implicitly.
+- [x] ACTIVE/history plans reject reordering atomically.
 
 **Tests**: integration — valid reorder, duplicate/missing/foreign ID rejection, identity preservation, frozen state and replay.
 **Gate**: full.
@@ -605,11 +611,12 @@ T47 → T48
 **Reuses**: PaymentPlanPolicy, ContractReferencePort, Unit of Work and AuditWriter.
 **Design**: §PaymentPlan and Installment Lifecycle; §Critical operation transactions.
 **Requirements**: PLAN-04, PLAN-05, PLAN-06, PLAN-07, INST-02–INST-03, INST-10–INST-11, ACCESS-03, ACCESS-05, ACCESS-07, IDEMP-01–IDEMP-07, EDGE-01–EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Activation requires valid BRL Contract context, positive defined total, at least one positive dated installment, exact plan/Contract equality and exact 1..N numbering.
-- [ ] Invalid activation leaves the plan DRAFT and leaves every number unchanged.
-- [ ] The ACTIVE transition, audit and idempotency record commit atomically.
+- [x] Activation requires valid BRL Contract context, positive defined total, at least one positive dated installment, exact plan/Contract equality and exact 1..N numbering.
+- [x] Invalid activation leaves the plan DRAFT and leaves every number unchanged.
+- [x] The ACTIVE transition, audit and idempotency record commit atomically.
 
 **Tests**: integration — each activation predicate, irregular sequence rejection, no renumbering, Contract mismatch and replay.
 **Gate**: full.
@@ -623,11 +630,12 @@ T47 → T48
 **Reuses**: Lifecycle policy, elevated AuthorizationPort grant and AuditWriter.
 **Design**: §PaymentPlan and Installment Lifecycle; §Authorization port.
 **Requirements**: PLAN-09–PLAN-10, INST-07–INST-09, ACCESS-03, ACCESS-06–ACCESS-07, ACCESS-11, IDEMP-01–IDEMP-07, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Only the elevated capability and a nonempty reason can transition a history-free ACTIVE plan to DRAFT.
-- [ ] History is tested as persisted event existence, not net balance.
-- [ ] Gerente Financeiro is denied and Vice-Presidente receives audited, idempotent success.
+- [x] Only the elevated capability and a nonempty reason can transition a history-free ACTIVE plan to DRAFT.
+- [x] History is tested as persisted event existence, not net balance.
+- [x] Gerente Financeiro is denied and Vice-Presidente receives audited, idempotent success.
 
 **Tests**: integration — actor separation, reason, status/history failures, full-reversal freeze and replay.
 **Gate**: full.
@@ -641,11 +649,12 @@ T47 → T48
 **Reuses**: Partial unique index, lifecycle policy, AuditWriter and elevated authorization.
 **Design**: §Discard persistence strategy; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-11–PLAN-12, INST-08, ACCESS-03, ACCESS-06–ACCESS-07, ACCESS-09, ACCESS-11, IDEMP-01–IDEMP-07, EDGE-02–EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Only an elevated actor with reason can mark a history-free DRAFT plan discarded.
-- [ ] A discarded plan disappears from active-plan reads while its audit evidence remains readable to an authorized auditor.
-- [ ] The Contract can receive a new plan; any history prevents discard and replacement.
+- [x] Only an elevated actor with reason can mark a history-free DRAFT plan discarded.
+- [x] A discarded plan disappears from active-plan reads while its audit evidence remains readable to an authorized auditor.
+- [x] The Contract can receive a new plan; any history prevents discard and replacement.
 
 **Tests**: integration — required flow, audit evidence, post-discard new plan, historical rejection and replay.
 **Gate**: full.
@@ -661,11 +670,12 @@ T47 → T48
 **Reuses**: ReceiptAllocationPolicy, locked Unit of Work, derived projection and AuditWriter.
 **Design**: §Receipt and Reversal Model; §Critical operation transactions.
 **Requirements**: PLAN-08, RECEIPT-01, RECEIPT-02, RECEIPT-03, RECEIPT-04, RECEIPT-05, RECEIPT-06, RECEIPT-07, RECEIPT-15–RECEIPT-16, ACCESS-03, ACCESS-05, ACCESS-07–ACCESS-09, IDEMP-01–IDEMP-08, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] A receipt has DB-generated immutable occurrence time and uses only one active plan's inherited Contract/Client/BRL context.
-- [ ] Multiple allocations may target several installments; proposed and existing allocations cannot exceed open balances, and their exact total equals receipt amount.
-- [ ] Draft plan, unallocated amount, negative/zero/excess precision, foreign-plan allocation and client timestamp all reject the entire transaction.
+- [x] A receipt has DB-generated immutable occurrence time and uses only one active plan's inherited Contract/Client/BRL context.
+- [x] Multiple allocations may target several installments; proposed and existing allocations cannot exceed open balances, and their exact total equals receipt amount.
+- [x] Draft plan, unallocated amount, negative/zero/excess precision, foreign-plan allocation and client timestamp all reject the entire transaction.
 
 **Tests**: integration — partial payment, one receipt across installments, exact sum, no unallocated/overpayment, atomic failures, audit and replay.
 **Gate**: full.
@@ -679,11 +689,12 @@ T47 → T48
 **Reuses**: Prisma integration harness and RegisterReceipt command.
 **Design**: §Allocation race condition; §Locking strategy and retry.
 **Requirements**: RECEIPT-06–RECEIPT-07, IDEMP-07, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Two concurrent R$700 receipt attempts against R$1.000 use separate PostgreSQL connections and exercise `PaymentPlan FOR UPDATE`.
-- [ ] Exactly one command commits; the other observes R$300 and fails with typed allocation-domain error.
-- [ ] Final net allocations never exceed R$1.000 and no partial audit/idempotency state remains for the failed command.
+- [x] Two concurrent R$700 receipt attempts against R$1.000 use separate PostgreSQL connections and exercise `PaymentPlan FOR UPDATE`.
+- [x] Exactly one command commits; the other observes R$300 and fails with typed allocation-domain error.
+- [x] Final net allocations never exceed R$1.000 and no partial audit/idempotency state remains for the failed command.
 
 **Tests**: integration — mandatory real PostgreSQL concurrent receipt test; no repository mock.
 **Gate**: full.
@@ -697,11 +708,12 @@ T47 → T48
 **Reuses**: ReversalPolicy, locked Unit of Work, AuditWriter and runtime projection.
 **Design**: §Receipt and Reversal Model; §Critical operation transactions.
 **Requirements**: REVERSE-01–REVERSE-10, RECEIPT-08–RECEIPT-15, ACCESS-03, ACCESS-06–ACCESS-07, ACCESS-09, ACCESS-11, IDEMP-01–IDEMP-08, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Positive reversal amount exactly equals positive reversal allocations and each targets exactly one original RECEIPT allocation on the inherited installment.
-- [ ] Partial/multiple/total reversals respect remaining reversible value and never edit/delete the original ledger facts.
-- [ ] Reversal of reversal, receipt/allocation mismatch, client occurrence time, missing reason or unavailable capability reject atomically.
+- [x] Positive reversal amount exactly equals positive reversal allocations and each targets exactly one original RECEIPT allocation on the inherited installment.
+- [x] Partial/multiple/total reversals respect remaining reversible value and never edit/delete the original ledger facts.
+- [x] Reversal of reversal, receipt/allocation mismatch, client occurrence time, missing reason or unavailable capability reject atomically.
 
 **Tests**: integration — partial/multiple/total reversal, reason/capability, immutable history, post-due restored balance, audit and replay.
 **Gate**: full.
@@ -715,11 +727,12 @@ T47 → T48
 **Reuses**: Prisma integration harness and ReverseReceipt command.
 **Design**: §Reversal race condition; §Locking strategy and retry.
 **Requirements**: REVERSE-03–REVERSE-04, IDEMP-07, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Two R$700 reversals of one R$1.000 original allocation execute concurrently through PostgreSQL.
-- [ ] Exactly one reversal persists; the second receives `REVERSAL_EXCEEDS_AVAILABLE` after re-reading state under the plan lock.
-- [ ] Persisted reversible total never exceeds R$1.000 and the failed attempt commits no audit/idempotency record.
+- [x] Two R$700 reversals of one R$1.000 original allocation execute concurrently through PostgreSQL.
+- [x] Exactly one reversal persists; the second receives `REVERSAL_EXCEEDS_AVAILABLE` after re-reading state under the plan lock.
+- [x] Persisted reversible total never exceeds R$1.000 and the failed attempt commits no audit/idempotency record.
 
 **Tests**: integration — mandatory real PostgreSQL concurrent reversal test; no repository mock.
 **Gate**: full.
@@ -735,11 +748,12 @@ T47 → T48
 **Reuses**: InstallmentProjectionPolicy, ContractReferencePort and AuditEvent table.
 **Design**: §Derived Financial Projection; §Financial command use cases.
 **Requirements**: RECEIPT-08–RECEIPT-14, REVERSE-06–REVERSE-07, ACCESS-01–ACCESS-02, ACCESS-08–ACCESS-09, EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Read models contain derived monetary strings/statuses and transaction/allocation/reversible timelines without writable projections.
-- [ ] Active-plan and audit queries use canonical Contract references, filter discarded plans correctly and avoid N+1 reads.
-- [ ] FINANCE_READ and FINANCIAL_AUDIT_READ are separately enforced in use cases.
+- [x] Read models contain derived monetary strings/statuses and transaction/allocation/reversible timelines without writable projections.
+- [x] Active-plan and audit queries use canonical Contract references, filter discarded plans correctly and avoid N+1 reads.
+- [x] FINANCE_READ and FINANCIAL_AUDIT_READ are separately enforced in use cases.
 
 **Tests**: integration — projection accuracy after receipts/reversals, discarded audit evidence, capability separation and query-count/bounded-query assertions.
 **Gate**: full.
@@ -753,11 +767,12 @@ T47 → T48
 **Reuses**: Design §Standard error envelope.
 **Design**: §Standard error envelope.
 **Requirements**: PLAN-02, PLAN-10, PLAN-12, INST-07–INST-10, RECEIPT-04–RECEIPT-07, REVERSE-03–REVERSE-05, IDEMP-04–IDEMP-06, ACCESS-03–ACCESS-06, EDGE-01–EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] All named design errors map to stable envelope, HTTP status and optional retriable flag.
-- [ ] `PAYMENT_PLAN_ALREADY_EXISTS` translates the partial-index violation rather than leaking ORM/database detail.
-- [ ] Unknown infrastructure failures are logged safely and produce no sensitive raw error response.
+- [x] All named design errors map to stable envelope, HTTP status and optional retriable flag.
+- [x] `PAYMENT_PLAN_ALREADY_EXISTS` translates the partial-index violation rather than leaking ORM/database detail.
+- [x] Unknown infrastructure failures are logged safely and produce no sensitive raw error response.
 
 **Tests**: API — every error family and no raw database message in responses.
 **Gate**: full.
@@ -771,11 +786,12 @@ T47 → T48
 **Reuses**: AuthenticatedCommandContext, FinanceCapability and IdempotencyPolicy.
 **Design**: §Hono HTTP adapters; §Monetary wire contract.
 **Requirements**: IDEMP-01, IDEMP-05, RECEIPT-02, RECEIPT-16, REVERSE-10, ACCESS-03–ACCESS-06, ACCESS-08.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Actor comes only from authenticated middleware, while every mutation requires a valid Idempotency-Key before handler invocation.
-- [ ] DTO schemas accept monetary strings/LocalDates only and reject unknown fields including actor, role, capability, status, derived values, currency and financial timestamps.
-- [ ] Middleware remains early rejection; every use case still calls AuthorizationPort itself.
+- [x] Actor comes only from authenticated middleware, while every mutation requires a valid Idempotency-Key before handler invocation.
+- [x] DTO schemas accept monetary strings/LocalDates only and reject unknown fields including actor, role, capability, status, derived values, currency and financial timestamps.
+- [x] Middleware remains early rejection; every use case still calls AuthorizationPort itself.
 
 **Tests**: API — missing/invalid key, unauthenticated/forbidden actor, forbidden fields, Number money and timestamp rejection.
 **Gate**: full.
@@ -789,11 +805,12 @@ T47 → T48
 **Reuses**: Hono command middleware and finance error mapper.
 **Design**: §API Design; §Hono HTTP adapters.
 **Requirements**: PLAN-01–PLAN-12, INST-01–INST-11, IDEMP-01–IDEMP-07, ACCESS-03–ACCESS-07, ACCESS-10–ACCESS-11, EDGE-01–EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Only the explicit design routes exist; no generic status PATCH, delete for a historical plan, or Contract/Client mutation endpoint is introduced.
-- [ ] Each route provides command-specific capability, closed DTO, idempotency and typed error behavior.
-- [ ] Handlers invoke one use case and contain no money arithmetic, state policy or direct Prisma operation.
+- [x] Only the explicit design routes exist; no generic status PATCH, delete for a historical plan, or Contract/Client mutation endpoint is introduced.
+- [x] Each route provides command-specific capability, closed DTO, idempotency and typed error behavior.
+- [x] Handlers invoke one use case and contain no money arithmetic, state policy or direct Prisma operation.
 
 **Tests**: API — every plan/installment route's happy, capability, idempotency and rejection cases.
 **Gate**: full.
@@ -807,11 +824,12 @@ T47 → T48
 **Reuses**: Hono command middleware, finance error mapper and transaction use cases.
 **Design**: §API Design; §Receipt and Reversal Model.
 **Requirements**: RECEIPT-01–RECEIPT-16, REVERSE-01–REVERSE-10, IDEMP-01–IDEMP-07, ACCESS-03–ACCESS-07, ACCESS-09, ACCESS-11, EDGE-02.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Receipt route accepts one PLAN-scoped amount/allocation command and reversal route accepts only original allocation references/reason.
-- [ ] DTOs cannot accept transaction type, occurrence time, computed balances/statuses, actor or arbitrary currency.
-- [ ] Idempotent replay returns original response and typed domain rejections leave no financial event.
+- [x] Receipt route accepts one PLAN-scoped amount/allocation command and reversal route accepts only original allocation references/reason.
+- [x] DTOs cannot accept transaction type, occurrence time, computed balances/statuses, actor or arbitrary currency.
+- [x] Idempotent replay returns original response and typed domain rejections leave no financial event.
 
 **Tests**: API — total/partial/multi-allocation receipt, reversal, forbidden fields/capability, idempotency replay/conflict and errors.
 **Gate**: full.
@@ -825,11 +843,12 @@ T47 → T48
 **Reuses**: Query use cases and finance error mapper.
 **Design**: §API Design; §Frontend Design.
 **Requirements**: ACCESS-01–ACCESS-02, ACCESS-04, ACCESS-08–ACCESS-09, RECEIPT-08–RECEIPT-14, REVERSE-06–REVERSE-07, EDGE-03.
+**Status**: Complete — 2026-08-18.
 **Done when**:
 
-- [ ] Contract financial situation and audit are distinct authorized routes with sanitized, non-PII response models.
-- [ ] PLATFORM_ADMIN-only callers receive no finance/audit data.
-- [ ] The query response formats every money value as a decimal string and never raw bigint.
+- [x] Contract financial situation and audit are distinct authorized routes with sanitized, non-PII response models.
+- [x] PLATFORM_ADMIN-only callers receive no finance/audit data.
+- [x] The query response formats every money value as a decimal string and never raw bigint.
 
 **Tests**: API — read/audit capability boundaries, no-plan/discard/history views and bigint-safe JSON response.
 **Gate**: full.

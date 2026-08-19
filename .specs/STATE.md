@@ -117,18 +117,22 @@
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
-- **Phase / Task**: Execute / T03 concluída; T04 autorizada no batch atual
+- **Phase / Task**: Execute / T01–T38 concluídas; frontend T39+ não iniciado
 - **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização; `tasks.md` possui 48 tasks, matriz de testes, dependências sem ciclos e cobertura dos 71 requisitos; T01 criou workspace npm, baseline TypeScript estrito, testes de foundation, lint, `.env.example` e regras de ignore sem iniciar a API, frontend, Prisma ou domínio; T02 criou a fronteira Hono mínima testável, o ponto de registro de módulos e o build real da API, sem iniciar ORM, rotas financeiras, autorização ou idempotência; T03 criou o shell React/TypeScript/Vite, seu build real e um teste de montagem sem backend, sem telas, cliente, capacidades ou fluxos financeiros
-- **In-progress** (file:line): none — T04 ainda não foi iniciada
-- **Next step**: Executar somente T04 no batch autorizado; T05 permanece fora deste batch.
+- **Completed (T04–T38)**: Prisma/PostgreSQL foundation, schema e garantias de integridade; MoneyBRL/LocalDate/projeções; ports, Unit of Work, auditoria e idempotência; lifecycle completo de PaymentPlan/Installment; receipts e reversals concorrentes; queries financeiras/auditoria; catálogo de erros, autenticação/capabilities, DTOs fechados e rotas Hono completas.
+- **In-progress** (file:line): none — BLOCO 2 encerrado em T38
+- **Next step**: Aguardar autorização explícita para T39 e o bloco de frontend financeiro.
 - **Blockers**: none
 - **Technical decision (T01)**: npm foi escolhido porque o repositório não possuía manifest, lockfile ou decisão prévia de package manager. `package.json` fixa `npm@10.9.8`; React/Vite, Hono e Prisma não foram instalados diretamente nesta task.
 - **Technical decision (T02)**: Hono é a única dependência runtime da API nesta foundation. `createApp` e `registerApiModules` separam bootstrap HTTP de futuros adapters de domínio; `/health` é a única rota de prova.
 - **Technical decision (T03)**: React, React DOM, Vite e o plugin React formam o único toolchain frontend. O harness usa `happy-dom` somente para montar o shell React em teste; `jsdom`, router, client de dados e bibliotecas de componentes não foram adicionados.
+- **Technical decision (T04–T38)**: PostgreSQL efêmero isolado aplica migrations Prisma do zero para integration/API tests; mutações usam capability no use case, preflight e advisory lock de idempotência, `PaymentPlan FOR UPDATE`, ledger/auditoria/idempotência no mesmo commit; Hono recebe contexto autenticado por adapter e expõe apenas DTOs fechados e rotas de comando explícitas.
 - **Principal files (T01)**: `package.json`, `package-lock.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.*.config.ts`, `.env.example`, `.gitignore`, `apps/api/package.json`, `apps/web/package.json`, `prisma/.gitkeep` e `tests/foundation/*`.
 - **Principal files (T02)**: `apps/api/src/app.ts`, `apps/api/src/app.api.test.ts`, `apps/api/tsconfig*.json`, `apps/api/package.json`, `vitest.api.config.ts` e scripts-raiz de build/typecheck.
 - **Principal files (T03)**: `apps/web/index.html`, `apps/web/src/{main,App}.tsx`, `apps/web/src/App.web.test.tsx`, `apps/web/{tsconfig,vite}.config.ts`, `apps/web/package.json`, `vitest.web.config.ts` e scripts-raiz de build/typecheck.
+- **Principal files (T20–T38)**: `apps/api/src/modules/finance-contract-receivables/{application,http,infrastructure}/**`, `apps/api/src/app.ts`, `scripts/postgres-test-harness.ts`, `package.json` e `.specs/features/finance-contract-receivables/tasks.md`.
 - **Verification (T01)**: `npm run build`, `npm run check`, `npm run test:unit`, `npm run test:integration`, `npm run test:api`, `npm run test:web`, `validate_tasks.py --strict` e `validate_spec.py --strict` passaram.
 - **Verification (T02)**: `npm run test:api` (3 testes), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check` (8 testes), `git diff --check`, `validate_tasks.py --strict` e `validate_spec.py --strict` passaram.
 - **Verification (T03)**: `npm run test:web` (2 testes), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check` (9 testes), `git diff --check`, `validate_tasks.py --strict` e `validate_spec.py --strict` passaram.
+- **Verification (T20–T38)**: `npm run test` passou com 77 testes (15 unitários, 17 integração PostgreSQL, 43 API sobre PostgreSQL real e 2 web do shell pré-T39); passaram também `npm run lint`, `npm run typecheck`, `npm run build`, `validate_tasks.py --strict`, `validate_spec.py --strict` e `git diff --check`. A integração cobre corrida 0..1 de PaymentPlan, receipt e reversal R$700+R$700 sobre R$1.000 com conexões distintas, rollback de auditoria, replay/conflito/concorrência idempotente, ledger append-only e projeções derivadas.
 - **Branch**: main
