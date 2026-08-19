@@ -15,8 +15,6 @@ test("manager uses the real session and reaches a real PostgreSQL contract", asy
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page.getByText("Gerente Financeiro", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Financeiro", exact: true }).click();
-  await page.getByLabel("ID canônico do contrato").fill("e2e-contract-manager");
-  await page.getByRole("button", { name: "Abrir contrato" }).click();
-  await expect(page.getByRole("heading", { name: "Nenhum plano de pagamento" })).toBeVisible();
-  await expect(page.getByText("Cliente canônico: e2e-client-manager · BRL")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Carteira de contratos" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Contrato de demonstração" })).toBeVisible();
 });

@@ -26,6 +26,61 @@ enum UserStatus {
   DISABLED
 }
 
+enum ClientType {
+  PERSON
+  COMPANY
+}
+
+enum ContractOrigin {
+  MANUAL_INTAKE
+  COMMERCIAL
+}
+
+enum ContractStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
+enum ContractProduct {
+  START
+  LOOP
+  NEXT
+  OTHER
+}
+
+enum ResourceLinkEntityType {
+  CONTRACT
+  PROJECT
+}
+
+enum ResourceLinkType {
+  CONTRACT
+  PROPOSAL
+  SCOPE
+  AMENDMENT
+  INVOICE
+  RECEIPT
+  DRIVE
+  FIGMA
+  NOTION
+  REPOSITORY
+  PRODUCTION
+  STAGING
+  DOCUMENTATION
+  OTHER
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  PAUSED
+  DELAYED
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id          String              @id @default(uuid()) @db.Uuid
   name        String              @db.VarChar(160)
@@ -38,6 +93,8 @@ model User {
   credential  Credential?
   sessions    Session[]
   privileges  PlatformPrivilege[]
+  createdContracts Contract[] @relation("ContractCreatedBy")
+  createdLinks ResourceLink[]
 
   @@index([status])
 }
@@ -49,6 +106,102 @@ model Member {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  managedProjects Project[]
+}
+
+model Client {
+  id                    String     @id @default(uuid()) @db.Uuid
+  name                  String     @db.VarChar(160)
+  type                  ClientType
+  documentNumber        String?    @db.VarChar(32)
+  email                 String?    @db.VarChar(320)
+  phone                 String?    @db.VarChar(48)
+  financialContactName  String?    @db.VarChar(160)
+  financialContactEmail String?    @db.VarChar(320)
+  financialContactPhone String?    @db.VarChar(48)
+  notes                 String?    @db.Text
+  createdAt             DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime   @updatedAt @db.Timestamptz(6)
+
+  contracts Contract[]
+  projects  Project[]
+
+  @@index([name])
+  @@index([documentNumber])
+}
+
+model Contract {
+  id                  String          @id @default(uuid()) @db.Uuid
+  name                String          @db.VarChar(200)
+  clientId            String          @db.Uuid
+  origin              ContractOrigin  @default(MANUAL_INTAKE)
+  status              ContractStatus  @default(ACTIVE)
+  product             ContractProduct
+  customProductName   String?         @db.VarChar(120)
+  contractValueCents  BigInt          @db.BigInt
+  signatureDate       DateTime?       @db.Date
+  startDate           DateTime?       @db.Date
+  expectedEndDate     DateTime?       @db.Date
+  executionTermMonths Int?
+  description         String?         @db.Text
+  internalNotes       String?         @db.Text
+  sharedProject       Boolean         @default(false)
+  partnerName         String?         @db.VarChar(160)
+  transferRule        String?         @db.Text
+  createdByUserId     String          @db.Uuid
+  createdAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @updatedAt @db.Timestamptz(6)
+
+  client              Client          @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  createdBy           User            @relation("ContractCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  project             Project?
+  links               ResourceLink[]
+
+  @@index([clientId, status])
+  @@index([status, expectedEndDate])
+}
+
+model Project {
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String        @db.VarChar(200)
+  clientId        String        @db.Uuid
+  contractId      String?       @unique @db.Uuid
+  status          ProjectStatus @default(NOT_STARTED)
+  managerMemberId String?       @db.Uuid
+  startDate       DateTime?     @db.Date
+  expectedEndDate DateTime?     @db.Date
+  description     String?       @db.Text
+  internalNotes   String?       @db.Text
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
+
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contract        Contract?     @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  manager         Member?       @relation(fields: [managerMemberId], references: [id], onDelete: SetNull)
+  links           ResourceLink[]
+
+  @@index([clientId, status])
+  @@index([managerMemberId, status])
+}
+
+model ResourceLink {
+  id              String                 @id @default(uuid()) @db.Uuid
+  entityType      ResourceLinkEntityType
+  contractId      String?                @db.Uuid
+  projectId       String?                @db.Uuid
+  type            ResourceLinkType
+  label           String                 @db.VarChar(160)
+  url             String                 @db.Text
+  description     String?                @db.Text
+  createdByUserId String                 @db.Uuid
+  createdAt       DateTime               @default(now()) @db.Timestamptz(6)
+
+  contract        Contract?              @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  project         Project?               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy       User                   @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([contractId])
+  @@index([projectId])
 }
 
 model Credential {

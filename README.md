@@ -1,17 +1,18 @@
 # ERP iJúnior
 
-## Bloco 3 local
+## Bloco 5 local
 
 1. Copie `.env.example` para um arquivo local ignorado e preencha os quatro pares de credenciais de desenvolvimento.
 2. Execute `npm run db:migrate:test` para validar as migrações em PostgreSQL isolado, ou aplique as migrações no banco local.
 3. Execute `npm run db:seed:dev` com `DATABASE_URL` definido. O seed é idempotente e nunca imprime senhas ou hashes.
 4. Inicie a API com `npm run dev:api` e o frontend com `npm run dev --workspace=@ijunior/web`.
 
-O Vite usa proxy same-origin para `/auth` e `/api`. O adapter persistido
-`DevContractReference` é somente para desenvolvimento/testes; o runtime de
-produção falha fechado até que a infraestrutura injete um
-`ContractReferencePort` externo real. Não há fallback para fixture. Comercial e
-Projetos são placeholders no Bloco 3.
+O Vite usa proxy same-origin para `/auth` e `/api`. O Bloco 5 entrega carteira
+de contratos, clientes, projetos, documentos/links, visão 360°, recebíveis e
+dashboard operacional sobre os mesmos registros canônicos do PostgreSQL. O
+adapter de referências contratuais agora é persistido em Prisma; não há
+fallback para fixture. Comercial continua como área reservada para a próxima
+integração.
 
 ## Runbook do MVP Financeiro
 

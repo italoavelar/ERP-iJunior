@@ -18,7 +18,7 @@ import { ReorderInstallments } from "./modules/finance-contract-receivables/appl
 import { ReturnPlanToDraft } from "./modules/finance-contract-receivables/application/ReturnPlanToDraft.js";
 import { ReverseReceipt } from "./modules/finance-contract-receivables/application/ReverseReceipt.js";
 import { LocalDate } from "./modules/finance-contract-receivables/domain/LocalDate.js";
-import { PrismaDevContractReferenceAdapter } from "./modules/finance-contract-receivables/infrastructure/PrismaDevContractReferenceAdapter.js";
+import { PrismaContractReferenceAdapter } from "./modules/finance-contract-receivables/infrastructure/PrismaContractReferenceAdapter.js";
 import { PrismaFinanceUnitOfWork } from "./modules/finance-contract-receivables/infrastructure/PrismaFinanceUnitOfWork.js";
 import { PrismaIdempotencyStore } from "./modules/finance-contract-receivables/infrastructure/PrismaIdempotencyStore.js";
 import { PrismaPaymentPlanLookup } from "./modules/finance-contract-receivables/infrastructure/PrismaPaymentPlanLookup.js";
@@ -58,7 +58,7 @@ export function buildRuntime() {
     getReceivables: new GetContractReceivables(prisma, authorization, contractPort, { todayIn: () => LocalDate.parse(new Date().toISOString().slice(0, 10)) }),
     getAudit: new GetFinancialAudit(prisma, authorization)
   };
-  return { app: createApp(finance, authService), prisma };
+  return { app: createApp(finance, authService, { prisma, authenticate }), prisma };
 }
 
 export function startRuntime(port: number = Number.parseInt(process.env.PORT ?? "8787", 10)) {
@@ -79,9 +79,4 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   process.once("SIGTERM", shutdown);
 }
 
-function resolveContractReferencePort(client: PrismaClient) {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("A real external ContractReferencePort must be configured in production; the development fixture adapter is disabled");
-  }
-  return new PrismaDevContractReferenceAdapter(client);
-}
+function resolveContractReferencePort(client: PrismaClient) { return new PrismaContractReferenceAdapter(client); }
