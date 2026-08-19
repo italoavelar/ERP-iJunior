@@ -17,7 +17,7 @@ export class CreatePaymentPlan {
       try {
         const plan = await tx.paymentPlan.create({ data: { contractId: context.contractId, clientId: context.clientId, currency: "BRL", totalCents: total.cents } });
         const payload = { id: plan.id, contractId: plan.contractId, clientId: plan.clientId, totalAmount: total.toApi(), status: "DRAFT" as const };
-        await this.audit.append(tx, { action: "finance.payment-plan.created", actorUserId: input.actor.actorUserId, aggregate: { type: "PaymentPlan", id: plan.id }, contractId: plan.contractId, paymentPlanId: plan.id, context: { clientId: plan.clientId, totalCents: total.cents.toString(), currency: "BRL" } });
+        await this.audit.append(tx, { action: "finance.payment-plan.created", actorUserId: input.actor.actorUserId, aggregate: { type: "PaymentPlan", id: plan.id }, contractId: plan.contractId, paymentPlanId: plan.id, context: { totalCents: total.cents.toString(), currency: "BRL" } });
         return { type: "PaymentPlan", id: plan.id, payload };
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") throw new FinanceDomainError("PAYMENT_PLAN_ALREADY_EXISTS");

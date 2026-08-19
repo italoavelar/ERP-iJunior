@@ -1,6 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { AuthorizationPort } from "./FinanceCapability.js";
 
+const safeContextKeys = new Set(["beforeCents", "afterCents", "totalCents", "priorStatus", "financialHistoryPresent", "discarded", "installmentId", "installmentNumber", "installmentIds", "dueDate", "amountCents", "allocationIds", "originalReceiptId", "originalAllocationIds", "currency"]);
+
+function safeAuditContext(value: unknown): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>).filter(([key]) => safeContextKeys.has(key)));
+}
+
 export class GetFinancialAudit {
   constructor(private readonly prisma: PrismaClient, private readonly authorization: AuthorizationPort) {}
   async execute(actorUserId: string, contractId: string, page: { cursor?: string; limit?: number } = {}) {
@@ -8,6 +15,6 @@ export class GetFinancialAudit {
     const limit = Math.max(1, Math.min(page.limit ?? 50, 100));
     const rows = await this.prisma.auditEvent.findMany({ where: { contractId, domain: "finance-contract-receivables" }, orderBy: [{ occurredAt: "asc" }, { id: "asc" }], take: limit + 1, ...(page.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}) });
     const hasMore = rows.length > limit; const events = rows.slice(0, limit);
-    return { contractId, events: events.map((event) => ({ id: event.id, action: event.action, aggregateType: event.aggregateType, aggregateId: event.aggregateId, paymentPlanId: event.paymentPlanId, transactionId: event.transactionId, actorUserId: event.actorUserId, reason: event.reason, context: event.context, occurredAt: event.occurredAt.toISOString() })), nextCursor: hasMore ? events.at(-1)!.id : null };
+    return { contractId, events: events.map((event) => ({ id: event.id, action: event.action, aggregateType: event.aggregateType, aggregateId: event.aggregateId, paymentPlanId: event.paymentPlanId, transactionId: event.transactionId, actorUserId: event.actorUserId, reason: event.reason, context: safeAuditContext(event.context), occurredAt: event.occurredAt.toISOString() })), nextCursor: hasMore ? events.at(-1)!.id : null };
   }
 }

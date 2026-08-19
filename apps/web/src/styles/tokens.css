@@ -18,7 +18,7 @@
   font-family: Inter, system-ui, sans-serif;
 }
 
-:root.light { color-scheme: light; --color-bg: #f4f9fa; --color-surface: #ffffff; --color-surface-raised: #eef4f5; --color-text: #112e33; --color-muted: #5b767b; --color-primary: #0e7c8b; --color-primary-strong: #0c6470; --color-border: #d8e6e8; --color-danger: #dc2626; --color-success: #0f8a57; }
+html.light { color-scheme: light; --color-bg: #f4f9fa; --color-surface: #ffffff; --color-surface-raised: #eef4f5; --color-text: #112e33; --color-muted: #5b767b; --color-primary: #0e7c8b; --color-primary-strong: #0c6470; --color-border: #d8e6e8; --color-danger: #dc2626; --color-success: #0f8a57; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--color-bg); color: var(--color-text); }
 button, input { font: inherit; }

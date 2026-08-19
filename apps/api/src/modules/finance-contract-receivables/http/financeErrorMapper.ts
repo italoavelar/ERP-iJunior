@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import { FinanceEnv } from "./financeCommandMiddleware.js";
 import { CapabilityMissingError } from "../application/FinanceCapability.js";
 import { FinanceDomainError } from "../application/FinanceDomainError.js";
 import { IdempotencyConflictError } from "../infrastructure/PrismaIdempotencyStore.js";
@@ -24,6 +25,8 @@ export function financeErrorResponse(context: Context, error: unknown): Response
   else if (error instanceof ConcurrentOperationError) { code = "CONCURRENT_OPERATION_CONFLICT"; status = 409; }
   else if (error instanceof MoneyBRLError) { code = "INVALID_MONEY"; status = 422; }
   else if (error instanceof LocalDateError) { code = "INVALID_DUE_DATE"; status = 422; }
-  else console.error("finance request failed", { errorType: error instanceof Error ? error.name : typeof error });
+  const financeContext = context as Context<FinanceEnv>;
+  if (code === "INTERNAL_ERROR") console.error(JSON.stringify({ event: "finance.request.error", requestId: financeContext.get("requestId") ?? "unavailable", route: new URL(context.req.url).pathname, errorType: error instanceof Error ? error.name : typeof error }));
+  financeContext.set("domainErrorCode", code);
   return context.json({ error: { code, message: messages[code] ?? code, ...(details && Object.keys(details).length > 0 ? { details } : {}), ...(code === "CONCURRENT_OPERATION_CONFLICT" ? { retriable: true } : {}) } }, status as 403 | 404 | 409 | 422 | 500);
 }

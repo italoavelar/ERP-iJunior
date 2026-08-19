@@ -60,6 +60,15 @@ describe("finance Hono API", () => {
     expect((await send("POST", `/api/finance/contracts/${contractId}/payment-plans`, "manager", { totalAmount: "10.00" }, idem)).status).toBe(200);
     const conflict = await send("POST", `/api/finance/contracts/${contractId}/payment-plans`, "manager", { totalAmount: "9.00" }, idem); expect(conflict.status).toBe(409); expect(await conflict.text()).not.toContain("Prisma");
   });
+  it("rejects every client-controlled actor, privilege and session field", async () => {
+    const fields = ["actorId", "actorUserId", "userId", "role", "capabilities", "PlatformPrivilege", "sessionId"] as const;
+    for (const field of fields) {
+      const body = { totalAmount: "1.00", [field]: field === "capabilities" ? ["PAYMENT_PLAN_CREATE"] : "vp" };
+      const response = await send("POST", "/api/finance/contracts/spoof/payment-plans", "manager", body, key());
+      expect(response.status, field).toBe(422);
+      expect((await response.json() as { error: { code: string } }).error.code, field).toBe("UNKNOWN_FIELD");
+    }
+  });
   it("returns canonical no-plan references and bounded audit pages", async () => {
     const contractId = `contract-${crypto.randomUUID()}`; const clientId = `client-${crypto.randomUUID()}`;
     contracts.set(contractId, { kind: "available", contractId, clientId, currency: "BRL", financialValue: MoneyBRL.parse("25.00"), eligibleForReceivables: true });

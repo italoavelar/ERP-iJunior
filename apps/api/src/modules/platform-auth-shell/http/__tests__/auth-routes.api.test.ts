@@ -31,6 +31,9 @@ describe("auth Hono routes", () => {
     const me = await app.request("http://localhost/auth/me", { headers: { Cookie: cookie?.split(";")[0] ?? "" } });
     expect(me.status).toBe(200);
     expect(await me.json()).toEqual({ user: { id: user.id, name: user.name, email: user.email, capabilities: ["FINANCE_READ"] } });
+    const secondLogin = await app.request("http://localhost/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email, password: "secret" }) });
+    expect(secondLogin.status).toBe(200);
+    expect(secondLogin.headers.get("set-cookie")).not.toBe(cookie);
   });
 
   it("rejects invalid credentials and unknown DTO fields without revealing account state", async () => {
@@ -52,5 +55,15 @@ describe("auth Hono routes", () => {
     expect(logout.status).toBe(204);
     expect(logout.headers.get("set-cookie")).toContain("Max-Age=0");
     expect((await app.request("http://localhost/auth/me")).status).toBe(401);
+  });
+
+  it("revokes the server-side session and rejects the old cookie after logout", async () => {
+    const repository = new Repository();
+    const app = createApp(undefined, new AuthService(repository, new Hasher()));
+    const login = await app.request("http://localhost/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email, password: "secret" }) });
+    const cookie = login.headers.get("set-cookie")?.split(";")[0] ?? "";
+    expect((await app.request("http://localhost/auth/me", { headers: { Cookie: cookie } })).status).toBe(200);
+    expect((await app.request("http://localhost/auth/logout", { method: "POST", headers: { Cookie: cookie } })).status).toBe(204);
+    expect((await app.request("http://localhost/auth/me", { headers: { Cookie: cookie } })).status).toBe(401);
   });
 });

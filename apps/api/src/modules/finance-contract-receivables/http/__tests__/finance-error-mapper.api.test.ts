@@ -60,7 +60,7 @@ describe("finance error mapper", () => {
     expect(mapped.status).toBe(500);
     expect(mapped.body.error.code).toBe("INTERNAL_ERROR");
     expect(mapped.text).not.toMatch(/postgres|password|secret|Prisma/i);
-    expect(logging).toHaveBeenCalledWith("finance request failed", { errorType: "Error" });
+    expect(logging).toHaveBeenCalledWith(JSON.stringify({ event: "finance.request.error", requestId: "unavailable", route: "/", errorType: "Error" }));
     logging.mockRestore();
   });
 });

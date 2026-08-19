@@ -2,7 +2,7 @@ import { Context, MiddlewareHandler } from "hono";
 import { AuthenticatedCommandContext, FinanceCapability } from "../application/FinanceCapability.js";
 import { FinanceDomainError } from "../application/FinanceDomainError.js";
 
-export type FinanceEnv = { Variables: { financeActor: AuthenticatedCommandContext } };
+export type FinanceEnv = { Variables: { financeActor: AuthenticatedCommandContext; requestId: string; domainErrorCode: string | undefined } };
 export type FinanceAuthenticator = (request: Request) => Promise<AuthenticatedCommandContext | undefined>;
 
 export function authenticationMiddleware(authenticate: FinanceAuthenticator): MiddlewareHandler<FinanceEnv> {
