@@ -18,7 +18,7 @@
     "test": "npm run test:unit && npm run test:integration && npm run test:api && npm run test:web",
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "tsx scripts/postgres-test-harness.ts test",
-    "test:api": "vitest run --config vitest.api.config.ts",
+    "test:api": "tsx scripts/postgres-test-harness.ts api",
     "test:web": "vitest run --config vitest.web.config.ts",
     "db:generate": "prisma generate",
     "db:migrate:test": "tsx scripts/postgres-test-harness.ts migrate",

@@ -1,0 +1,28 @@
+import { Context, Hono } from "hono";
+import { ActivatePaymentPlan } from "../application/ActivatePaymentPlan.js";
+import { ChangeDraftPlanTotal } from "../application/ChangeDraftPlanTotal.js";
+import { CreateInstallment } from "../application/CreateInstallment.js";
+import { CreatePaymentPlan } from "../application/CreatePaymentPlan.js";
+import { DiscardPaymentPlan } from "../application/DiscardPaymentPlan.js";
+import { EditDraftInstallment } from "../application/EditDraftInstallment.js";
+import { RemoveDraftInstallment } from "../application/RemoveDraftInstallment.js";
+import { ReorderInstallments } from "../application/ReorderInstallments.js";
+import { ReturnPlanToDraft } from "../application/ReturnPlanToDraft.js";
+import { FinanceDomainError } from "../application/FinanceDomainError.js";
+import { FinanceEnv, capabilityMiddleware, closedEmptyBody, closedJson, idempotencyKey, routeParam, stringArrayField, stringField } from "./financeCommandMiddleware.js";
+import { financeErrorResponse } from "./financeErrorMapper.js";
+
+export interface PaymentPlanRouteUseCases { createPlan: CreatePaymentPlan; changeTotal: ChangeDraftPlanTotal; createInstallment: CreateInstallment; editInstallment: EditDraftInstallment; removeInstallment: RemoveDraftInstallment; reorderInstallments: ReorderInstallments; activatePlan: ActivatePaymentPlan; returnPlanToDraft: ReturnPlanToDraft; discardPlan: DiscardPaymentPlan; }
+const run = (handler: (context: Context<FinanceEnv>) => Promise<unknown>) => async (context: Context<FinanceEnv>) => { try { const result = await handler(context); return context.json(result); } catch (error) { return financeErrorResponse(context, error); } };
+
+export function registerPaymentPlanRoutes(app: Hono<FinanceEnv>, useCases: PaymentPlanRouteUseCases): void {
+  app.post("/api/finance/contracts/:contractId/payment-plans", capabilityMiddleware("PAYMENT_PLAN_CREATE"), run(async (c) => { const body = await closedJson(c, ["totalAmount"]); return useCases.createPlan.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), contractId: routeParam(c, "contractId"), totalAmount: stringField(body, "totalAmount")! }); }));
+  app.patch("/api/finance/payment-plans/:planId/draft-total", capabilityMiddleware("PAYMENT_PLAN_EDIT_DRAFT"), run(async (c) => { const body = await closedJson(c, ["totalAmount"]); return useCases.changeTotal.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), totalAmount: stringField(body, "totalAmount")! }); }));
+  app.post("/api/finance/payment-plans/:planId/installments", capabilityMiddleware("INSTALLMENT_CREATE"), run(async (c) => { const body = await closedJson(c, ["originalAmount", "dueDate", "installmentNumber"]); const number = body.installmentNumber; if (number !== undefined && (typeof number !== "number" || !Number.isInteger(number))) throw new FinanceDomainError("INVALID_INSTALLMENT_NUMBER"); return useCases.createInstallment.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), originalAmount: stringField(body, "originalAmount")!, dueDate: stringField(body, "dueDate")!, ...(number === undefined ? {} : { installmentNumber: number }) }); }));
+  app.patch("/api/finance/payment-plans/:planId/installments/:installmentId", capabilityMiddleware("INSTALLMENT_EDIT_DRAFT"), run(async (c) => { const body = await closedJson(c, ["originalAmount", "dueDate"]); return useCases.editInstallment.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), installmentId: routeParam(c, "installmentId"), ...(body.originalAmount === undefined ? {} : { originalAmount: stringField(body, "originalAmount")! }), ...(body.dueDate === undefined ? {} : { dueDate: stringField(body, "dueDate")! }) }); }));
+  app.delete("/api/finance/payment-plans/:planId/installments/:installmentId", capabilityMiddleware("INSTALLMENT_REMOVE"), run(async (c) => { await closedEmptyBody(c); return useCases.removeInstallment.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), installmentId: routeParam(c, "installmentId") }); }));
+  app.post("/api/finance/payment-plans/:planId/installments/reorder", capabilityMiddleware("INSTALLMENT_REORDER"), run(async (c) => { const body = await closedJson(c, ["installmentIds"]); return useCases.reorderInstallments.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), installmentIds: stringArrayField(body, "installmentIds") }); }));
+  app.post("/api/finance/payment-plans/:planId/activate", capabilityMiddleware("PAYMENT_PLAN_ACTIVATE"), run(async (c) => { await closedEmptyBody(c); return useCases.activatePlan.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId") }); }));
+  app.post("/api/finance/payment-plans/:planId/return-to-draft", capabilityMiddleware("PAYMENT_PLAN_RETURN_TO_DRAFT"), run(async (c) => { const body = await closedJson(c, ["reason"]); return useCases.returnPlanToDraft.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), reason: stringField(body, "reason")! }); }));
+  app.post("/api/finance/payment-plans/:planId/discard", capabilityMiddleware("PAYMENT_PLAN_DISCARD"), run(async (c) => { const body = await closedJson(c, ["reason"]); return useCases.discardPlan.execute({ actor: c.get("financeActor"), idempotencyKey: idempotencyKey(c), planId: routeParam(c, "planId"), reason: stringField(body, "reason")! }); }));
+}

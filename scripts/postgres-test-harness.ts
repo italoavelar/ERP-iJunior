@@ -38,7 +38,8 @@ async function withDatabase(command: string): Promise<void> {
     const env = { ...process.env, DATABASE_URL: databaseUrl, DATABASE_URL_TEST: databaseUrl };
     await run("npx", ["prisma", "migrate", "deploy"], env);
     if (command === "migrate") return;
-    await run("npx", ["vitest", "run", "--config", "vitest.integration.config.ts"], env);
+    const config = command === "api" ? "vitest.api.config.ts" : "vitest.integration.config.ts";
+    await run("npx", ["vitest", "run", "--config", config], env);
   } finally {
     spawnSync(join(postgresBin, "pg_ctl"), ["-D", dataDir, "-m", "immediate", "stop"], { stdio: "ignore" });
     await rm(dataDir, { recursive: true, force: true });
@@ -46,5 +47,5 @@ async function withDatabase(command: string): Promise<void> {
 }
 
 const command = process.argv[2];
-if (command !== "migrate" && command !== "test") throw new Error("expected migrate or test");
+if (command !== "migrate" && command !== "test" && command !== "api") throw new Error("expected migrate, test or api");
 await withDatabase(command);
