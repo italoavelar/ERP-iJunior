@@ -40,6 +40,7 @@
 - `validate_tasks.py --strict` for both features — PASS
 - `validate_spec.py --strict` for both features — PASS
 - `git diff --check` — PASS
+- Development seed idempotence — PASS: two executions on PostgreSQL produced 4 users, 24 explicit privileges and 1 canonical dev contract.
 
 ## Discrimination Sensor
 
