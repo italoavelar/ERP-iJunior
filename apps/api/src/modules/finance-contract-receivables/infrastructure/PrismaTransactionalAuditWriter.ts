@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { FinanceTransaction } from "./PrismaFinanceUnitOfWork.js";
 
 export const FinanceAuditActions = [
-  "finance.payment-plan.created", "finance.payment-plan.activated", "finance.payment-plan.returned-to-draft", "finance.payment-plan.discarded",
+  "finance.payment-plan.created", "finance.payment-plan.total-changed", "finance.payment-plan.activated", "finance.payment-plan.returned-to-draft", "finance.payment-plan.discarded",
   "finance.installment.created", "finance.installment.updated", "finance.installment.removed", "finance.installments.reordered",
   "finance.receipt.registered", "finance.receipt.reversed"
 ] as const;
