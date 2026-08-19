@@ -6,7 +6,7 @@ Implement these tasks with the `tlc-spec-driven` skill, using its Execute flow a
 
 **Spec:** `.specs/features/finance-contract-receivables/spec.md`  
 **Design:** `.specs/features/finance-contract-receivables/design.md`  
-**Status:** Draft — awaiting Tasks approval; no implementation artifacts have been created.
+**Status:** Complete — T01–T48 implemented and independently validated.
 
 ## Test Coverage Matrix
 
@@ -1018,11 +1018,12 @@ T47 → T48
 **Reuses**: Domain error mapper, command middleware and AuditWriter data contract.
 **Design**: §Responsibility boundaries; §Audit writer; §Locking strategy and retry.
 **Requirements**: ACCESS-03–ACCESS-04, ACCESS-07–ACCESS-09, IDEMP-01–IDEMP-08, EDGE-02.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Errors have a correlation/request ID and safe structured context; idempotency keys are masked or handled as sensitive operational data.
-- [ ] Logs/audit never copy Client/Contract personal-data payloads or raw financial command payloads indiscriminately.
-- [ ] Tests prove no route is registered without capability guard, raw SQL parameters are bound, and API never serializes bigint directly.
+- [x] Errors have a correlation/request ID and safe structured context; idempotency keys are masked or handled as sensitive operational data.
+- [x] Logs/audit never copy Client/Contract personal-data payloads or raw financial command payloads indiscriminately.
+- [x] Tests prove no route is registered without capability guard, raw SQL parameters are bound, and API never serializes bigint directly.
 
 **Tests**: API — route guard audit, safe error/log context and bigint serialization regression tests.
 **Gate**: full.
@@ -1036,11 +1037,12 @@ T47 → T48
 **Reuses**: All feature fixtures, real PostgreSQL harness and test coverage matrix.
 **Design**: §Requirements Traceability; §Semantic Review Against the Specification.
 **Requirements**: PLAN-01–PLAN-12, INST-01–INST-11, RECEIPT-01–RECEIPT-16, REVERSE-01–REVERSE-10, IDEMP-01–IDEMP-08, ACCESS-01–ACCESS-11, EDGE-01–EDGE-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Acceptance scenarios compose the approved plan, installment, receipt, reversal, authorization, audit and discard flows without testing out-of-scope behavior.
-- [ ] The final automated requirement-ID comparison reports all 71 spec IDs mentioned by at least one implemented task/test and no unknown feature requirement ID.
-- [ ] Full check, strict spec validation, strict task validation and whitespace check pass with no suppression.
+- [x] Acceptance scenarios compose the approved plan, installment, receipt, reversal, authorization, audit and discard flows without testing out-of-scope behavior.
+- [x] The final automated requirement-ID comparison reports all 71 spec IDs mentioned by at least one implemented task/test and no unknown feature requirement ID.
+- [x] Full check, strict spec validation, strict task validation and whitespace check pass with no suppression.
 
 **Tests**: integration — cross-layer acceptance, requirement coverage and regression gates; frontend flows remain in their co-located suite.
 **Gate**: build.
@@ -1168,4 +1170,4 @@ Every task that modifies executable behavior includes its matching test layer in
 - [x] All 71 specification IDs are represented by at least one implementation task and a final acceptance check.
 - [x] PaymentPlan lifecycle, Installment identity/numbering, receipt, reversal, authorization, audit, idempotency and race conditions have explicit tasks.
 - [x] No task implements a declared out-of-scope item or starts implementation in this planning phase.
-- [ ] User approves this `tasks.md` before Execute begins.
+- [x] User approved this `tasks.md`; implementation and final acceptance are complete.

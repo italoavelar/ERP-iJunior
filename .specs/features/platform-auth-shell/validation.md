@@ -12,7 +12,7 @@
 | T01–T07 | ✅ Done | specification, Prisma migration, Argon2id/session services, Hono routes, runtime, seed and docs are present; strict validators pass |
 | T08–T09 | ✅ Done | React Router/AuthProvider/shell, central client, tokens and proxy compile and pass web tests |
 | T10–T13 | ✅ Done | receivables states, draft/activation, receipt, elevated actions, reversal and audit controls are implemented in `ContractReceivablesPage.tsx` |
-| T14–T15 | ✅ Done | finance T39–T46 are marked Complete; T47/T48 remain unchecked; all gates and this report pass |
+| T14–T15 | ✅ Done | finance T39–T48 are marked Complete; hardening, cross-layer acceptance and this report pass all gates |
 
 ## Spec-Anchored Acceptance Criteria
 
@@ -34,8 +34,8 @@
 
 - `npm run lint` — PASS
 - `npm run typecheck` — PASS
-- `npm run test` — PASS: 89 tests (22 unit, 19 PostgreSQL integration, 46 API, 2 web)
-- `npm run test:e2e` — PASS: 1 Chromium smoke journey
+- `npm run test` — PASS: 103 tests (22 unit, 22 PostgreSQL integration, 55 API, 4 web)
+- `npm run test:e2e` — PASS: 2 Chromium journeys against real PostgreSQL/API/Vite
 - `npm run build` — PASS
 - `validate_tasks.py --strict` for both features — PASS
 - `validate_spec.py --strict` for both features — PASS
@@ -52,6 +52,6 @@ The real worktree porcelain was unchanged after scratch cleanup. No surviving mu
 
 ## Quality Review
 
-The implementation uses explicit platform privileges, keeps authorization in finance use cases, uses bound SQL parameters, avoids raw tokens/passwords in responses, keeps money as decimal strings, uses shared CSS tokens, avoids page-local hex/dark classes, and does not use `alert()` or `confirm()`. Commercial and Projects remain placeholders. T47/T48 were not started.
+The implementation uses explicit platform privileges, keeps authorization in finance use cases, uses bound SQL parameters, avoids raw tokens/passwords in responses, keeps money as decimal strings, uses shared CSS tokens, avoids page-local hex/dark classes, and does not use `alert()` or `confirm()`. Commercial and Projects remain placeholders. T47/T48 add safe correlation/logging, audit privacy, boundary checks, requirement coverage and real cross-layer acceptance without introducing new product scope.
 
 **Verdict: PASS ✅**

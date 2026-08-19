@@ -133,13 +133,14 @@
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
-- **Phase / Task**: Execute / T01–T46 concluídas; T47/T48 não iniciadas
+- **Phase / Task**: Execute / T01–T48 concluídas; Bloco 4 encerrado
 - **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização; `tasks.md` possui 48 tasks, matriz de testes, dependências sem ciclos e cobertura dos 71 requisitos; T01 criou workspace npm, baseline TypeScript estrito, testes de foundation, lint, `.env.example` e regras de ignore sem iniciar a API, frontend, Prisma ou domínio; T02 criou a fronteira Hono mínima testável, o ponto de registro de módulos e o build real da API, sem iniciar ORM, rotas financeiras, autorização ou idempotência; T03 criou o shell React/TypeScript/Vite, seu build real e um teste de montagem sem backend, sem telas, cliente, capacidades ou fluxos financeiros
 - **Completed (T04–T38)**: Prisma/PostgreSQL foundation, schema e garantias de integridade; MoneyBRL/LocalDate/projeções; ports, Unit of Work, auditoria e idempotência; lifecycle completo de PaymentPlan/Installment; receipts e reversals concorrentes; queries financeiras/auditoria; catálogo de erros, autenticação/capabilities, DTOs fechados e rotas Hono completas.
 - **Completed (Bloco 3)**: `platform-auth-shell` especificada, desenhada e validada; User/Member/Credential/Session/PlatformPrivilege persistidos; Argon2id, token SHA-256, cookie HttpOnly de 8 horas, login/me/logout, CSRF Origin, seed dev idempotente, runtime Node Hono, proxy Vite, AuthProvider, guards, shell capability-aware e Financeiro Web T39–T46 implementados.
-- **In-progress** (file:line): none — BLOCO 3 encerrado em T46
-- **Next step**: T47/T48 permanecem fora deste bloco; Comercial e Projetos continuam placeholders.
-- **Blockers**: none
+- **Completed (Bloco 4)**: T47 adicionou correlação segura por request ID, logging estruturado sem payload sensível, mapper de erro genérico, privacidade de auditoria e verificações estáticas de guards/SQL/BigInt. T48 adicionou a aceitação cross-layer em PostgreSQL real, comparação automatizada dos 71 requisitos, jornada E2E real com Chromium/Vite/Hono e runbook operacional.
+- **In-progress** (file:line): none — BLOCO 4 encerrado em T48
+- **Next step**: parar conforme o escopo aprovado; T49+ e qualquer ciclo Comercial, Projetos ou RH permanecem fora deste bloco.
+- **Blockers**: nenhum técnico para o MVP; produção continua exigindo `ContractReferencePort` externo real e o adapter de desenvolvimento falha fechado fora de dev/test.
 - **Technical decision (T01)**: npm foi escolhido porque o repositório não possuía manifest, lockfile ou decisão prévia de package manager. `package.json` fixa `npm@10.9.8`; React/Vite, Hono e Prisma não foram instalados diretamente nesta task.
 - **Technical decision (T02)**: Hono é a única dependência runtime da API nesta foundation. `createApp` e `registerApiModules` separam bootstrap HTTP de futuros adapters de domínio; `/health` é a única rota de prova.
 - **Technical decision (T03)**: React, React DOM, Vite e o plugin React formam o único toolchain frontend. O harness usa `happy-dom` somente para montar o shell React em teste; `jsdom`, router, client de dados e bibliotecas de componentes não foram adicionados.
@@ -152,4 +153,5 @@
 - **Verification (T02)**: `npm run test:api` (3 testes), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check` (8 testes), `git diff --check`, `validate_tasks.py --strict` e `validate_spec.py --strict` passaram.
 - **Verification (T03)**: `npm run test:web` (2 testes), `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check` (9 testes), `git diff --check`, `validate_tasks.py --strict` e `validate_spec.py --strict` passaram.
 - **Verification (T20–T38)**: `npm run test` passou com 77 testes (15 unitários, 17 integração PostgreSQL, 43 API sobre PostgreSQL real e 2 web do shell pré-T39); passaram também `npm run lint`, `npm run typecheck`, `npm run build`, `validate_tasks.py --strict`, `validate_spec.py --strict` e `git diff --check`. A integração cobre corrida 0..1 de PaymentPlan, receipt e reversal R$700+R$700 sobre R$1.000 com conexões distintas, rollback de auditoria, replay/conflito/concorrência idempotente, ledger append-only e projeções derivadas.
+- **Verification (Bloco 4)**: `npm run test` passou com 103 testes (22 unitários, 22 integração PostgreSQL, 55 API e 4 web); `npm run test:e2e` passou com 2 jornadas Chromium contra PostgreSQL/API/Vite reais; `npm run lint`, `npm run typecheck`, `npm run build`, `validate:finance-coverage` (71/71), validadores estritos das duas features e `git diff --check` passaram.
 - **Branch**: main

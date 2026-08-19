@@ -24,6 +24,7 @@
     "db:generate": "prisma generate",
     "db:migrate:test": "tsx scripts/postgres-test-harness.ts migrate",
     "db:test": "tsx scripts/postgres-test-harness.ts test",
+    "validate:finance-coverage": "tsx scripts/validate-finance-requirement-coverage.ts",
     "dev:api": "tsx apps/api/src/server.ts",
     "db:seed:dev": "tsx scripts/seed-dev.ts",
     "check": "npm run lint && npm run typecheck && npm run test"

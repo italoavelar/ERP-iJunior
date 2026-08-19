@@ -1,5 +1,7 @@
 import { serve } from "@hono/node-server";
 import { PrismaClient } from "@prisma/client";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { createApp } from "./app.js";
 import { ActivatePaymentPlan } from "./modules/finance-contract-receivables/application/ActivatePaymentPlan.js";
 import { ChangeDraftPlanTotal } from "./modules/finance-contract-receivables/application/ChangeDraftPlanTotal.js";
@@ -27,46 +29,55 @@ import { Argon2CredentialHasher } from "./modules/platform-auth-shell/infrastruc
 import { PrismaFinanceAuthorizationPort } from "./modules/platform-auth-shell/infrastructure/PrismaFinanceAuthorizationPort.js";
 import { readSessionCookie } from "./modules/platform-auth-shell/http/cookies.js";
 
-const port = Number.parseInt(process.env.PORT ?? "8787", 10);
-const prisma = new PrismaClient();
-const authRepository = new PrismaAuthRepository(prisma);
-const authService = new AuthService(authRepository, new Argon2CredentialHasher());
-const authorization = new PrismaFinanceAuthorizationPort(authRepository);
-const contractPort = resolveContractReferencePort(prisma);
-const unit = new PrismaFinanceUnitOfWork(prisma);
-const executor = new FinanceCommandExecutor(authorization, unit, new PrismaIdempotencyStore(prisma));
-const audit = new PrismaTransactionalAuditWriter();
-const authenticate = async (request: Request) => {
-  const principal = await authService.resolve(readSessionCookie(request));
-  return principal ? { actorUserId: principal.id, capabilities: principal.capabilities } : undefined;
-};
-const finance = {
-  authenticate,
-  createPlan: new CreatePaymentPlan(contractPort, authorization, executor, audit),
-  changeTotal: new ChangeDraftPlanTotal(authorization, executor, audit),
-  createInstallment: new CreateInstallment(authorization, executor, audit),
-  editInstallment: new EditDraftInstallment(authorization, executor, audit),
-  removeInstallment: new RemoveDraftInstallment(authorization, executor, audit),
-  reorderInstallments: new ReorderInstallments(authorization, executor, audit),
-  activatePlan: new ActivatePaymentPlan(authorization, executor, contractPort, new PrismaPaymentPlanLookup(prisma), audit),
-  returnPlanToDraft: new ReturnPlanToDraft(authorization, executor, audit),
-  discardPlan: new DiscardPaymentPlan(authorization, executor, audit),
-  registerReceipt: new RegisterReceipt(authorization, executor, audit),
-  reverseReceipt: new ReverseReceipt(authorization, executor, audit),
-  getReceivables: new GetContractReceivables(prisma, authorization, contractPort, { todayIn: () => LocalDate.parse(new Date().toISOString().slice(0, 10)) }),
-  getAudit: new GetFinancialAudit(prisma, authorization)
-};
-const app = createApp(finance, authService);
+export function buildRuntime() {
+  const prisma = new PrismaClient();
+  const authRepository = new PrismaAuthRepository(prisma);
+  const authService = new AuthService(authRepository, new Argon2CredentialHasher());
+  const authorization = new PrismaFinanceAuthorizationPort(authRepository);
+  const contractPort = resolveContractReferencePort(prisma);
+  const unit = new PrismaFinanceUnitOfWork(prisma);
+  const executor = new FinanceCommandExecutor(authorization, unit, new PrismaIdempotencyStore(prisma));
+  const audit = new PrismaTransactionalAuditWriter();
+  const authenticate = async (request: Request) => {
+    const principal = await authService.resolve(readSessionCookie(request));
+    return principal ? { actorUserId: principal.id, capabilities: principal.capabilities } : undefined;
+  };
+  const finance = {
+    authenticate,
+    createPlan: new CreatePaymentPlan(contractPort, authorization, executor, audit),
+    changeTotal: new ChangeDraftPlanTotal(authorization, executor, audit),
+    createInstallment: new CreateInstallment(authorization, executor, audit),
+    editInstallment: new EditDraftInstallment(authorization, executor, audit),
+    removeInstallment: new RemoveDraftInstallment(authorization, executor, audit),
+    reorderInstallments: new ReorderInstallments(authorization, executor, audit),
+    activatePlan: new ActivatePaymentPlan(authorization, executor, contractPort, new PrismaPaymentPlanLookup(prisma), audit),
+    returnPlanToDraft: new ReturnPlanToDraft(authorization, executor, audit),
+    discardPlan: new DiscardPaymentPlan(authorization, executor, audit),
+    registerReceipt: new RegisterReceipt(authorization, executor, audit),
+    reverseReceipt: new ReverseReceipt(authorization, executor, audit),
+    getReceivables: new GetContractReceivables(prisma, authorization, contractPort, { todayIn: () => LocalDate.parse(new Date().toISOString().slice(0, 10)) }),
+    getAudit: new GetFinancialAudit(prisma, authorization)
+  };
+  return { app: createApp(finance, authService), prisma };
+}
 
-const server = serve({ fetch: app.fetch, port });
-console.log(`iJúnior API listening on http://localhost:${port}`);
+export function startRuntime(port: number = Number.parseInt(process.env.PORT ?? "8787", 10)) {
+  const runtime = buildRuntime();
+  const server = serve({ fetch: runtime.app.fetch, port });
+  return { ...runtime, server };
+}
 
-const shutdown = async () => {
-  server.close();
-  await prisma.$disconnect();
-};
-process.once("SIGINT", shutdown);
-process.once("SIGTERM", shutdown);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const port = Number.parseInt(process.env.PORT ?? "8787", 10);
+  const runtime = startRuntime(port);
+  console.log(`iJúnior API listening on http://localhost:${port}`);
+  const shutdown = async () => {
+    runtime.server.close();
+    await runtime.prisma.$disconnect();
+  };
+  process.once("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
+}
 
 function resolveContractReferencePort(client: PrismaClient) {
   if (process.env.NODE_ENV === "production") {
