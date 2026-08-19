@@ -22,7 +22,7 @@ Finance command authorization remains inside each use case. The executor shares 
 
 ## Frontend visual system
 
-Global tokens implement the supplied iTracker/iJúnior briefing: dark-first graphite surfaces, teal/cyan actions, Sora for headings/KPIs, Inter for content, glass only on sticky header/sidebar/dropdowns, semantic badges, and accessible focus rings. Pages consume primitives and tokens instead of local hex values or parallel dark-mode classes. Finance forms use Sheet on desktop and Dialog on mobile; destructive actions require Dialog confirmation.
+Global tokens implement the repository-authoritative [`iTracker Design Guideline`](../../../docs/product/design-guideline.md) and [`ERP iJúnior Design System`](../../../docs/product/09-design-system.md): dark-first graphite surfaces, teal/cyan actions, Sora for headings/KPIs, Inter for content, glass only on sticky header/sidebar/dropdowns, semantic badges, and accessible focus rings. The ERP document explicitly extends the iTracker base; it is not a parallel visual system. Pages consume primitives and tokens instead of local hex values or parallel dark-mode classes. Finance forms use Sheet on desktop and Dialog on mobile; destructive actions require Dialog confirmation.
 
 ## Verification
 

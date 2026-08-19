@@ -114,6 +114,22 @@
 - **Date**: 2026-08-18
 - **Status**: active
 
+### AD-015
+- **Decision**: A identidade visual do ERP herda o iTracker Design Guideline e é ampliada pelo ERP iJúnior Design System; Login, AppShell e Financeiro não podem criar um sistema paralelo.
+- **Reason**: A continuidade visual entre produtos é um requisito de produto e reduz divergência entre módulos futuros.
+- **Trade-off**: Novos componentes precisam reutilizar tokens, padrões de shell, overlays, feedback e acessibilidade já documentados.
+- **Scope**: Frontend do ERP iJúnior e futuros módulos Comercial, Projetos e RH.
+- **Date**: 2026-08-19
+- **Status**: active
+
+### AD-016
+- **Decision**: O adapter persistido de ContractReferencePort é exclusivo de desenvolvimento/teste; produção falha fechado na ausência de uma implementação externa real.
+- **Reason**: Contract pertence ao Comercial e uma fixture não pode virar fonte silenciosa de produção.
+- **Trade-off**: O runtime de produção permanece bloqueado até a integração externa ser injetada explicitamente.
+- **Scope**: Runtime Node/Hono, Financeiro e integrações de Contract.
+- **Date**: 2026-08-19
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`

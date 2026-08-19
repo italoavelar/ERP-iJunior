@@ -4,6 +4,33 @@
 **Atualizado em:** 2026-08-18
 **Fonte:** decisões de produto registradas nesta revisão.
 
+## Sistema visual autoritativo
+
+A identidade do ERP iJúnior pertence ao mesmo ecossistema visual do iTracker.
+Os documentos abaixo são as fontes autoritativas para qualquer decisão de
+interface e devem ser lidos em conjunto:
+
+- [iTracker — Design Guideline](design-guideline.md), base visual compartilhada;
+- [Design System — ERP iJúnior](09-design-system.md), extensão dessa base para
+  um produto multi-módulo.
+
+A herança é explícita:
+
+```text
+iTracker Design Guideline
+        ↓
+base visual compartilhada
+        ↓
+ERP iJúnior Design System
+        ↓
+Login / AppShell / Financeiro
+        ↓
+futuramente Comercial / Projetos / RH
+```
+
+O Design System do ERP amplia o iTracker; não o substitui nem autoriza um
+segundo sistema visual paralelo.
+
 Esta área é a referência permanente do domínio do ERP interno da iJúnior. Ela antecede qualquer feature e não define arquitetura, banco de dados, APIs ou telas.
 
 ## Leitura dos estados

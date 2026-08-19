@@ -28,12 +28,11 @@ import { PrismaFinanceAuthorizationPort } from "./modules/platform-auth-shell/in
 import { readSessionCookie } from "./modules/platform-auth-shell/http/cookies.js";
 
 const port = Number.parseInt(process.env.PORT ?? "8787", 10);
-if (process.env.NODE_ENV === "production" && process.env.CONTRACT_REFERENCE_ADAPTER !== "external") throw new Error("CONTRACT_REFERENCE_ADAPTER=external is required in production");
 const prisma = new PrismaClient();
 const authRepository = new PrismaAuthRepository(prisma);
 const authService = new AuthService(authRepository, new Argon2CredentialHasher());
 const authorization = new PrismaFinanceAuthorizationPort(authRepository);
-const contractPort = new PrismaDevContractReferenceAdapter(prisma);
+const contractPort = resolveContractReferencePort(prisma);
 const unit = new PrismaFinanceUnitOfWork(prisma);
 const executor = new FinanceCommandExecutor(authorization, unit, new PrismaIdempotencyStore(prisma));
 const audit = new PrismaTransactionalAuditWriter();
@@ -68,3 +67,10 @@ const shutdown = async () => {
 };
 process.once("SIGINT", shutdown);
 process.once("SIGTERM", shutdown);
+
+function resolveContractReferencePort(client: PrismaClient) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("A real external ContractReferencePort must be configured in production; the development fixture adapter is disabled");
+  }
+  return new PrismaDevContractReferenceAdapter(client);
+}

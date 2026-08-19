@@ -7,4 +7,8 @@
 3. Execute `npm run db:seed:dev` com `DATABASE_URL` definido. O seed é idempotente e nunca imprime senhas ou hashes.
 4. Inicie a API com `npm run dev:api` e o frontend com `npm run dev --workspace=@ijunior/web`.
 
-O Vite usa proxy same-origin para `/auth` e `/api`. Em produção, configure um `ContractReferencePort` externo e `CONTRACT_REFERENCE_ADAPTER=external`; o adapter persistido `DevContractReference` é somente para desenvolvimento/testes. Comercial e Projetos são placeholders no Bloco 3.
+O Vite usa proxy same-origin para `/auth` e `/api`. O adapter persistido
+`DevContractReference` é somente para desenvolvimento/testes; o runtime de
+produção falha fechado até que a infraestrutura injete um
+`ContractReferencePort` externo real. Não há fallback para fixture. Comercial e
+Projetos são placeholders no Bloco 3.

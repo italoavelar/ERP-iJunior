@@ -26,7 +26,7 @@ The ERP needs one shared authenticated session and capability model for the Hono
 
 | Assumption | Chosen default | Rationale |
 | --- | --- | --- |
-| Visual source | The attached iTracker/iJúnior briefing | The referenced design files are not present in the workspace. |
+| Visual source | [`docs/product/design-guideline.md`](../../../docs/product/design-guideline.md) and [`docs/product/09-design-system.md`](../../../docs/product/09-design-system.md) | The ERP inherits the iTracker foundation and extends it for a multi-module shell. |
 | Password hashing | Argon2id | It is the established password-hashing requirement for this block. |
 | Development topology | Same-origin Vite proxy | It avoids development CORS while preserving an explicit production allowlist. |
 | Contract ownership | External `ContractReferencePort` in production; persisted dev adapter in development/test | Commercial remains the owner and is not implemented here. |
