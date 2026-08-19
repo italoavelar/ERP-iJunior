@@ -1,0 +1,1 @@
+export function PlaceholderPage({ title, detail }: { title: string; detail: string }) { return <section className="page-heading"><div><p className="muted">Módulo</p><h1>{title}</h1><p className="muted">{detail}</p></div></section>; }

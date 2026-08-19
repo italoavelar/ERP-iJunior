@@ -117,11 +117,12 @@
 ## Handoff
 
 - **Feature**: `finance-contract-receivables` / `.specs/features/finance-contract-receivables/spec.md`
-- **Phase / Task**: Execute / T01–T38 concluídas; frontend T39+ não iniciado
+- **Phase / Task**: Execute / T01–T46 concluídas; T47/T48 não iniciadas
 - **Completed**: Pendências FIN-002, FIN-003, PLA-001 e recorte de PLA-003 fechados para a feature; `spec.md` validado em modo estrito; `design.md` cobre 71 requisitos e passou revisão adversarial de modelo relacional, dinheiro, transações, auditoria, idempotência, concorrência e autorização; `tasks.md` possui 48 tasks, matriz de testes, dependências sem ciclos e cobertura dos 71 requisitos; T01 criou workspace npm, baseline TypeScript estrito, testes de foundation, lint, `.env.example` e regras de ignore sem iniciar a API, frontend, Prisma ou domínio; T02 criou a fronteira Hono mínima testável, o ponto de registro de módulos e o build real da API, sem iniciar ORM, rotas financeiras, autorização ou idempotência; T03 criou o shell React/TypeScript/Vite, seu build real e um teste de montagem sem backend, sem telas, cliente, capacidades ou fluxos financeiros
 - **Completed (T04–T38)**: Prisma/PostgreSQL foundation, schema e garantias de integridade; MoneyBRL/LocalDate/projeções; ports, Unit of Work, auditoria e idempotência; lifecycle completo de PaymentPlan/Installment; receipts e reversals concorrentes; queries financeiras/auditoria; catálogo de erros, autenticação/capabilities, DTOs fechados e rotas Hono completas.
-- **In-progress** (file:line): none — BLOCO 2 encerrado em T38
-- **Next step**: Aguardar autorização explícita para T39 e o bloco de frontend financeiro.
+- **Completed (Bloco 3)**: `platform-auth-shell` especificada, desenhada e validada; User/Member/Credential/Session/PlatformPrivilege persistidos; Argon2id, token SHA-256, cookie HttpOnly de 8 horas, login/me/logout, CSRF Origin, seed dev idempotente, runtime Node Hono, proxy Vite, AuthProvider, guards, shell capability-aware e Financeiro Web T39–T46 implementados.
+- **In-progress** (file:line): none — BLOCO 3 encerrado em T46
+- **Next step**: T47/T48 permanecem fora deste bloco; Comercial e Projetos continuam placeholders.
 - **Blockers**: none
 - **Technical decision (T01)**: npm foi escolhido porque o repositório não possuía manifest, lockfile ou decisão prévia de package manager. `package.json` fixa `npm@10.9.8`; React/Vite, Hono e Prisma não foram instalados diretamente nesta task.
 - **Technical decision (T02)**: Hono é a única dependência runtime da API nesta foundation. `createApp` e `registerApiModules` separam bootstrap HTTP de futuros adapters de domínio; `/health` é a única rota de prova.

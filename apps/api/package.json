@@ -6,10 +6,13 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit --project tsconfig.json",
-    "test:api": "vitest run --config ../../vitest.api.config.ts"
+    "test:api": "vitest run --config ../../vitest.api.config.ts",
+    "start": "node dist/server.js"
   },
   "dependencies": {
+    "@hono/node-server": "^2.1.1",
     "@prisma/client": "6.19.2",
+    "argon2": "^0.45.1",
     "hono": "^4.13.3"
   }
 }

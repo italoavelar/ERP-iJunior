@@ -1,5 +1,5 @@
 import { createServer } from "node:net";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
@@ -36,7 +36,13 @@ async function withDatabase(command: string): Promise<void> {
     await run(join(postgresBin, "pg_ctl"), ["-D", dataDir, "-o", `-p ${port} -h 127.0.0.1 -k ${dataDir}`, "-w", "start"]);
     await run(join(postgresBin, "createdb"), ["-h", "127.0.0.1", "-p", String(port), "-U", databaseUser, "ijunior_finance_test"]);
     const env = { ...process.env, DATABASE_URL: databaseUrl, DATABASE_URL_TEST: databaseUrl };
-    await run("npx", ["prisma", "migrate", "deploy"], env);
+    const migrationRoot = join(root, "prisma", "migrations");
+    const migrations = (await readdir(migrationRoot, { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+    const psqlUrl = databaseUrl.split("?")[0] ?? databaseUrl;
+    for (const migration of migrations) await run("psql", [psqlUrl, "-v", "ON_ERROR_STOP=1", "-f", join(migrationRoot, migration, "migration.sql")], env);
     if (command === "migrate") return;
     const config = command === "api" ? "vitest.api.config.ts" : "vitest.integration.config.ts";
     await run("npx", ["vitest", "run", "--config", config], env);

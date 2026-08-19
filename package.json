@@ -20,20 +20,25 @@
     "test:integration": "tsx scripts/postgres-test-harness.ts test",
     "test:api": "tsx scripts/postgres-test-harness.ts api",
     "test:web": "vitest run --config vitest.web.config.ts",
+    "test:e2e": "playwright test",
     "db:generate": "prisma generate",
     "db:migrate:test": "tsx scripts/postgres-test-harness.ts migrate",
     "db:test": "tsx scripts/postgres-test-harness.ts test",
+    "dev:api": "tsx apps/api/src/server.ts",
+    "db:seed:dev": "tsx scripts/seed-dev.ts",
     "check": "npm run lint && npm run typecheck && npm run test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@prisma/client": "6.19.2",
     "@types/node": "^22.20.1",
     "eslint": "^10.8.1",
     "globals": "^17.11.0",
-    "typescript": "^6.0.3",
+    "linkedom": "^0.18.13",
     "prisma": "6.19.2",
     "tsx": "^4.20.6",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.11"
   }

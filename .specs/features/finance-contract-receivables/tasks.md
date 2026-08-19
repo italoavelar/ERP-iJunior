@@ -864,11 +864,12 @@ T47 → T48
 **Reuses**: Design §Monetary wire contract and §Frontend Design.
 **Design**: §Frontend Design; §Idempotency Design.
 **Requirements**: IDEMP-01–IDEMP-04, IDEMP-07–IDEMP-08, ACCESS-01–ACCESS-02.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Money stays a decimal string at the UI boundary; no client financial calculation uses Number.
-- [ ] Each logical submit creates one key, disables double-submit and retains the key for explicit retry after ambiguous failure.
-- [ ] A new user action creates a new key; values/dates are never used as duplicate heuristics.
+- [x] Money stays a decimal string at the UI boundary; no client financial calculation uses Number.
+- [x] Each logical submit creates one key, disables double-submit and retains the key for explicit retry after ambiguous failure.
+- [x] A new user action creates a new key; values/dates are never used as duplicate heuristics.
 
 **Tests**: frontend — header propagation, double-click prevention, same-key retry and new-action key generation.
 **Gate**: full.
@@ -882,11 +883,12 @@ T47 → T48
 **Reuses**: Typed query client and read model.
 **Design**: §Frontend Design.
 **Requirements**: ACCESS-01, ACCESS-04, ACCESS-08, RECEIPT-08–RECEIPT-14, REVERSE-06–REVERSE-07.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Only FINANCE_READ users can reach data; absence of a plan is rendered without offering unauthorized edits.
-- [ ] Contract/Client references are readonly and contain no client personal-data duplication.
-- [ ] Derived monetary/status display comes from the API response, not local authoritative recalculation.
+- [x] Only FINANCE_READ users can reach data; absence of a plan is rendered without offering unauthorized edits.
+- [x] Contract/Client references are readonly and contain no client personal-data duplication.
+- [x] Derived monetary/status display comes from the API response, not local authoritative recalculation.
 
 **Tests**: frontend — authorized/no-plan/forbidden states and money-string rendering.
 **Gate**: full.
@@ -900,11 +902,12 @@ T47 → T48
 **Reuses**: Typed mutation client and plan route contracts.
 **Design**: §Frontend Design; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-01–PLAN-03, ACCESS-05, ACCESS-10–ACCESS-11, IDEMP-01–IDEMP-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Controls appear only for the correct capabilities and explain Contract/Client as readonly references.
-- [ ] Input is sent as decimal string and errors display typed API feedback.
-- [ ] Retry uses the original logical-submit key without a duplicate local request.
+- [x] Controls appear only for the correct capabilities and explain Contract/Client as readonly references.
+- [x] Input is sent as decimal string and errors display typed API feedback.
+- [x] Retry uses the original logical-submit key without a duplicate local request.
 
 **Tests**: frontend — create/edit capability states, error render and idempotent submit behavior.
 **Gate**: full.
@@ -918,11 +921,12 @@ T47 → T48
 **Reuses**: Plan query/mutation contracts and LocalDate/money wire types.
 **Design**: §Frontend Design; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-04–PLAN-07, INST-01–INST-11, ACCESS-05, ACCESS-10–ACCESS-11, IDEMP-01–IDEMP-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Draft users can add/edit/remove/reorder stable installment rows, with number separate from due date.
-- [ ] Activation is an explicit action; it never silently renumbers a locally irregular sequence.
-- [ ] API validation feedback handles totals, numbers, dates and frozen/ACTIVE state.
+- [x] Draft users can add/edit/remove/reorder stable installment rows, with number separate from due date.
+- [x] Activation is an explicit action; it never silently renumbers a locally irregular sequence.
+- [x] API validation feedback handles totals, numbers, dates and frozen/ACTIVE state.
 
 **Tests**: frontend — draft management, shared due dates, irregular activation error and capability-driven controls.
 **Gate**: full.
@@ -936,11 +940,12 @@ T47 → T48
 **Reuses**: Active-plan projection and receipt route contract.
 **Design**: §Frontend Design; §Receipt and Reversal Model.
 **Requirements**: PLAN-08, RECEIPT-01–RECEIPT-16, ACCESS-05, ACCESS-10–ACCESS-11, IDEMP-01–IDEMP-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] UI guides allocation total against selected plan balances without becoming the integrity boundary.
-- [ ] Receipt submit is unavailable for DRAFT and the response refreshes the API projection/timeline.
-- [ ] UI never accepts caller-entered timestamp, Client/Contract/currency replacement or derived values.
+- [x] UI guides allocation total against selected plan balances without becoming the integrity boundary.
+- [x] Receipt submit is unavailable for DRAFT and the response refreshes the API projection/timeline.
+- [x] UI never accepts caller-entered timestamp, Client/Contract/currency replacement or derived values.
 
 **Tests**: frontend — partial/multi-installment input, typed rejection, retry-safe submission and timeline refresh.
 **Gate**: full.
@@ -954,11 +959,12 @@ T47 → T48
 **Reuses**: Typed plan lifecycle client and capability set.
 **Design**: §Frontend Design; §PaymentPlan and Installment Lifecycle.
 **Requirements**: PLAN-09–PLAN-12, ACCESS-06, ACCESS-11, IDEMP-01–IDEMP-03, EDGE-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Gerente Financeiro cannot invoke/display elevated actions; Vice-Presidente can only submit a nonempty reason.
-- [ ] The UI explains that history/freeze blocks the action and displays typed server rejection without optimistic state mutation.
-- [ ] Discard correctly returns to no-plan state after server confirmation.
+- [x] Gerente Financeiro cannot invoke/display elevated actions; Vice-Presidente can only submit a nonempty reason.
+- [x] The UI explains that history/freeze blocks the action and displays typed server rejection without optimistic state mutation.
+- [x] Discard correctly returns to no-plan state after server confirmation.
 
 **Tests**: frontend — capability separation, mandatory reason, history rejection and discard outcome.
 **Gate**: full.
@@ -972,11 +978,12 @@ T47 → T48
 **Reuses**: Transaction timeline, reversible amounts and reversal route contract.
 **Design**: §Frontend Design; §Receipt and Reversal Model.
 **Requirements**: REVERSE-01–REVERSE-10, ACCESS-06–ACCESS-07, ACCESS-09, ACCESS-11, IDEMP-01–IDEMP-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] Reversal UI selects only original receipt allocations, shows read-only reversible amounts and requires a reason.
-- [ ] The control is unavailable without the elevated reversal capability; backend authorization remains authoritative.
-- [ ] Historical transaction rows remain immutable timeline entries, not editable form state.
+- [x] Reversal UI selects only original receipt allocations, shows read-only reversible amounts and requires a reason.
+- [x] The control is unavailable without the elevated reversal capability; backend authorization remains authoritative.
+- [x] Historical transaction rows remain immutable timeline entries, not editable form state.
 
 **Tests**: frontend — VP-only reversal, partial reversal input, required reason and immutable-history rendering.
 **Gate**: full.
@@ -990,11 +997,12 @@ T47 → T48
 **Reuses**: Typed audit query client and sanitized AuditEvent read model.
 **Design**: §Frontend Design; §Audit writer.
 **Requirements**: ACCESS-02, ACCESS-04, ACCESS-07–ACCESS-09, PLAN-11, REVERSE-08–REVERSE-09, EDGE-03.
+**Status**: Complete — 2026-08-19.
 **Done when**:
 
-- [ ] FINANCIAL_AUDIT_READ independently controls the panel; FINANCE_READ or PLATFORM_ADMIN alone does not reveal audit data.
-- [ ] The timeline shows actor, time, action, required reason and minimal references, including discard evidence, without copied personal data.
-- [ ] Audit entries are read-only and do not expose edit/delete controls.
+- [x] FINANCIAL_AUDIT_READ independently controls the panel; FINANCE_READ or PLATFORM_ADMIN alone does not reveal audit data.
+- [x] The timeline shows actor, time, action, required reason and minimal references, including discard evidence, without copied personal data.
+- [x] Audit entries are read-only and do not expose edit/delete controls.
 
 **Tests**: frontend — audit-capability isolation, discard evidence and immutable/non-PII rendering.
 **Gate**: full.

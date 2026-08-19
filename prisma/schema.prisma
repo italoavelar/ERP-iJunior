@@ -21,6 +21,94 @@ enum CurrencyCode {
   BRL
 }
 
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String              @db.VarChar(160)
+  email       String              @unique @db.VarChar(320)
+  status      UserStatus          @default(ACTIVE)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(6)
+
+  member      Member?
+  credential  Credential?
+  sessions    Session[]
+  privileges  PlatformPrivilege[]
+
+  @@index([status])
+}
+
+model Member {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Credential {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @unique @db.Uuid
+  passwordHash String    @db.Text
+  algorithm    String    @default("argon2id") @db.VarChar(32)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
+  revokedAt    DateTime? @db.Timestamptz(6)
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Char(64)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt DateTime  @db.Timestamptz(6)
+  revokedAt DateTime? @db.Timestamptz(6)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model PlatformPrivilege {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @db.Uuid
+  capabilityCode String    @db.VarChar(96)
+  domain         String    @db.VarChar(64)
+  scope          String    @default("global") @db.VarChar(96)
+  grantedAt      DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt      DateTime? @db.Timestamptz(6)
+  revokedAt      DateTime? @db.Timestamptz(6)
+  reason         String?   @db.Text
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, capabilityCode, domain, scope])
+  @@index([userId, domain, capabilityCode])
+  @@index([expiresAt, revokedAt])
+}
+
+/// Development/test-only reference adapter storage. It is not a Commercial model.
+model DevContractReference {
+  id              String       @id @default(uuid()) @db.Uuid
+  contractId      String       @unique @db.VarChar(128)
+  clientId        String       @db.VarChar(128)
+  currency        CurrencyCode @default(BRL)
+  financialCents  BigInt       @db.BigInt
+  eligible        Boolean      @default(true)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+
+  @@index([clientId])
+}
+
 model PaymentPlan {
   id            String            @id @default(uuid()) @db.Uuid
   contractId    String            @db.VarChar(128)
