@@ -1,6 +1,6 @@
 # Platform Auth Shell Specification
 
-**Status:** Closed — ready for implementation.
+**Status:** Closed — implemented and verified.
 
 ## Problem Statement
 
@@ -8,10 +8,10 @@ The ERP needs one shared authenticated session and capability model for the Hono
 
 ## Goals
 
-- [ ] Authenticate users with Argon2id credentials and an opaque eight-hour HttpOnly session.
-- [ ] Resolve explicit `PlatformPrivilege` rows into the existing `FinanceCapability` contract.
-- [ ] Protect browser mutations with Origin validation and expose login, session and logout endpoints.
-- [ ] Provide a capability-aware React shell and the Financeiro receivables experience through T39–T46.
+- [x] Authenticate users with Argon2id credentials and an opaque eight-hour HttpOnly session.
+- [x] Resolve explicit `PlatformPrivilege` rows into the existing `FinanceCapability` contract.
+- [x] Protect browser mutations with Origin validation and expose login, session and logout endpoints.
+- [x] Provide a capability-aware React shell and the Financeiro receivables experience through T39–T46.
 
 ## Out of Scope
 
