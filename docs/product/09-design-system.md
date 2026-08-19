@@ -1,3 +1,8 @@
+# Design System — ERP iJúnior
+
+> Extensão multi-módulo da base visual compartilhada definida pelo iTracker
+> Design Guideline. Este documento é autoritativo para o frontend do ERP.
+
 ============================================================
 IDENTIDADE VISUAL OBRIGATÓRIA DO ERP iJÚNIOR
 ============================================================
