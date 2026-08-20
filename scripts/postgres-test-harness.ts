@@ -35,7 +35,14 @@ async function withDatabase(command: string): Promise<void> {
     await run(join(postgresBin, "initdb"), ["-D", dataDir, "--auth=trust", "--no-locale", "-E", "UTF8"]);
     await run(join(postgresBin, "pg_ctl"), ["-D", dataDir, "-o", `-p ${port} -h 127.0.0.1 -k ${dataDir}`, "-w", "start"]);
     await run(join(postgresBin, "createdb"), ["-h", "127.0.0.1", "-p", String(port), "-U", databaseUser, "ijunior_finance_test"]);
-    const env = { ...process.env, DATABASE_URL: databaseUrl, DATABASE_URL_TEST: databaseUrl };
+    const env = { ...process.env, DATABASE_URL: databaseUrl, DIRECT_URL: databaseUrl, DATABASE_URL_TEST: databaseUrl };
+    if (command === "migrate-deploy") {
+      // Run twice against the same empty database: the second invocation must
+      // report no pending migrations and must not seed or reset anything.
+      await run("npx", ["prisma", "migrate", "deploy", "--schema", "prisma/schema.prisma"], env);
+      await run("npx", ["prisma", "migrate", "deploy", "--schema", "prisma/schema.prisma"], env);
+      return;
+    }
     const migrationRoot = join(root, "prisma", "migrations");
     const migrations = (await readdir(migrationRoot, { withFileTypes: true }))
       .filter((entry) => entry.isDirectory())
@@ -53,5 +60,5 @@ async function withDatabase(command: string): Promise<void> {
 }
 
 const command = process.argv[2];
-if (command !== "migrate" && command !== "test" && command !== "api") throw new Error("expected migrate, test or api");
+if (command !== "migrate" && command !== "migrate-deploy" && command !== "test" && command !== "api") throw new Error("expected migrate, migrate-deploy, test or api");
 await withDatabase(command);

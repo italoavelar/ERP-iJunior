@@ -1,5 +1,10 @@
 # ERP iJúnior
 
+## Homologação Vercel + Neon
+
+O runbook de dois projetos Vercel (Web + API), Neon, migrations, bootstrap,
+Preview fechado e smoke test está em [docs/deployment/vercel-neon-homologation.md](docs/deployment/vercel-neon-homologation.md).
+
 ## Bloco 5 local
 
 1. Copie `.env.example` para um arquivo local ignorado e preencha os quatro pares de credenciais de desenvolvimento.

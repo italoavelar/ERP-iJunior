@@ -2,7 +2,9 @@ export class HttpError extends Error {
   constructor(readonly status: number, readonly code: string, message: string, readonly details?: unknown) { super(message); this.name = "HttpError"; }
 }
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
+// Browser requests always remain on the public Web origin. Vite proxies these
+// paths locally and Vercel rewrites them to the API in homologation.
+const baseUrl = "";
 
 export async function httpRequest<T>(path: string, init: RequestInit = {}): Promise<T | undefined> {
   const response = await fetch(`${baseUrl}${path}`, { ...init, credentials: "include", headers: { Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers } });

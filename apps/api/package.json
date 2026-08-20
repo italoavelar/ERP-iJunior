@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "build:vercel": "node scripts/vercel-build.mjs",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "test:api": "vitest run --config ../../vitest.api.config.ts",
     "start": "node dist/server.js"

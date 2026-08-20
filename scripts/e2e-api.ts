@@ -38,6 +38,7 @@ const databaseUrl = `postgresql://${encodeURIComponent(databaseUser)}@127.0.0.1:
 const environment = {
   ...process.env,
   DATABASE_URL: databaseUrl,
+  DIRECT_URL: databaseUrl,
   DATABASE_URL_TEST: databaseUrl,
   NODE_ENV: "development",
   WEB_ORIGINS: "http://127.0.0.1:4173,http://localhost:4173",

@@ -28,8 +28,10 @@ import { PrismaAuthRepository } from "./modules/platform-auth-shell/infrastructu
 import { Argon2CredentialHasher } from "./modules/platform-auth-shell/infrastructure/Argon2CredentialHasher.js";
 import { PrismaFinanceAuthorizationPort } from "./modules/platform-auth-shell/infrastructure/PrismaFinanceAuthorizationPort.js";
 import { readSessionCookie } from "./modules/platform-auth-shell/http/cookies.js";
+import { validateRuntimeEnvironment } from "./runtime/environment.js";
 
 export function buildRuntime() {
+  validateRuntimeEnvironment();
   const prisma = new PrismaClient();
   const authRepository = new PrismaAuthRepository(prisma);
   const authService = new AuthService(authRepository, new Argon2CredentialHasher());
@@ -79,4 +81,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   process.once("SIGTERM", shutdown);
 }
 
-function resolveContractReferencePort(client: PrismaClient) { return new PrismaContractReferenceAdapter(client); }
+function resolveContractReferencePort(client: PrismaClient) {
+  const configuredAdapter = process.env.CONTRACT_REFERENCE_ADAPTER ?? (process.env.NODE_ENV === "production" ? undefined : "prisma");
+  if (configuredAdapter !== "prisma") {
+    throw new Error("CONTRACT_REFERENCE_ADAPTER must be set to prisma for this runtime");
+  }
+  return new PrismaContractReferenceAdapter(client);
+}
