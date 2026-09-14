@@ -13,6 +13,3 @@ export function useMediaQuery(query: string) {
 
   return matches
 }
-
-/** O design troca sidebar por bottom-nav a partir de 1024px. */
-export const useIsDesktop = () => useMediaQuery('(min-width: 1024px)')
