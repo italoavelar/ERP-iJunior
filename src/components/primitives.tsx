@@ -1,6 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { IconCheckBox } from './Icons'
 
+export function Chip({ tone, children }: { tone: readonly [string, string]; children: ReactNode }) {
+  return (
+    <span className="chip" style={{ background: tone[0], color: tone[1] }}>
+      {children}
+    </span>
+  )
+}
+
 export function Card({
   children,
   style,

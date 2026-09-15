@@ -22,6 +22,7 @@ export function Sheet({
   children,
   footer,
   width,
+  hideHeader = false,
 }: {
   open: boolean
   onClose: () => void
@@ -31,6 +32,8 @@ export function Sheet({
   children: ReactNode
   footer?: ReactNode
   width?: number
+  /** O conteúdo traz o próprio cabeçalho (título + fechar). */
+  hideHeader?: boolean
 }) {
   useEscape(onClose)
   if (!open) return null
@@ -69,25 +72,36 @@ export function Sheet({
           animation: desktop ? 'slideIn 220ms ease both' : 'pop 160ms ease both',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div>
-            <h2 style={{ margin: 0, fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 19 }}>
-              {title}
-            </h2>
-            {subtitle && (
-              <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--mutedfg)' }}>{subtitle}</p>
-            )}
+        {!hideHeader && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+            <div>
+              <h2 style={{ margin: 0, fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 19 }}>
+                {title}
+              </h2>
+              {subtitle && (
+                <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--mutedfg)' }}>{subtitle}</p>
+              )}
+            </div>
+            <button
+              className="icon-btn"
+              onClick={onClose}
+              aria-label="Fechar"
+              style={{ width: 32, height: 32, flex: 'none' }}
+            >
+              <IconClose />
+            </button>
           </div>
-          <button
-            className="icon-btn"
-            onClick={onClose}
-            aria-label="Fechar"
-            style={{ width: 32, height: 32, flex: 'none' }}
-          >
-            <IconClose />
-          </button>
+        )}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: hideHeader ? 20 : 16,
+            marginTop: hideHeader ? 0 : 20,
+          }}
+        >
+          {children}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 20 }}>{children}</div>
         {footer && <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>{footer}</div>}
       </div>
     </div>

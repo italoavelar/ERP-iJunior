@@ -61,3 +61,18 @@ export const IconCheckBox = ({ size = 22 }: IconProps) => (
     <path d="M8.5 12.2l2.6 2.6 4.4-5.4" />
   </svg>
 )
+
+export const IconProjects = ({ size = 19 }: IconProps) => (
+  <svg {...base(size)}>
+    <rect x={3} y={7} width={18} height={13} rx={2.5} />
+    <path d="M9 7V5h6v2" />
+  </svg>
+)
+
+export const IconNF = ({ size = 19 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M6 3h8l4 4v14H6z" />
+    <path d="M14 3v4h4" />
+    <path d="M9 13h6M9 17h4" />
+  </svg>
+)
