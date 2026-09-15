@@ -12,3 +12,9 @@ export const BRL = (n: number) =>
 /** Dias entre hoje e uma data ISO. Negativo = vencido. */
 export const daysTo = (iso: string) =>
   Math.round((new Date(iso).getTime() - new Date(today()).getTime()) / 86400000)
+
+/** Situação da parcela a partir do pagamento e do vencimento. */
+export const installmentStatus = (paid: boolean, dueDate: string) => {
+  if (paid) return 'Paga' as const
+  return daysTo(dueDate) < 0 ? ('Vencida' as const) : ('A vencer' as const)
+}

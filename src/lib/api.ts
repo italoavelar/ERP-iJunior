@@ -1,4 +1,4 @@
-import type { Activity, Person, Project } from './types'
+import type { Activity, Person, Project, ProjectDetail, ProjectInput } from './types'
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -64,8 +64,20 @@ export const api = {
 
   projects: {
     list: () => request<Project[]>('/api/projects'),
+    get: (id: string) => request<ProjectDetail>(`/api/projects/${id}`),
+    update: (id: string, input: Partial<ProjectInput>) =>
+      request<ProjectDetail>(`/api/projects/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      }),
+    /** Atalho: NF da primeira parcela em aberto. */
     setNF: (id: string, issued: boolean) =>
-      request<Project>(`/api/projects/${id}/nf`, {
+      request<ProjectDetail>(`/api/projects/${id}/nf`, {
+        method: 'PATCH',
+        body: JSON.stringify({ issued }),
+      }),
+    setInstallmentNF: (id: string, number: number, issued: boolean) =>
+      request<ProjectDetail>(`/api/projects/${id}/installments/${number}/nf`, {
         method: 'PATCH',
         body: JSON.stringify({ issued }),
       }),

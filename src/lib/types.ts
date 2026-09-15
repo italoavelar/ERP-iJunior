@@ -19,6 +19,15 @@ export interface Activity {
   doneAt: string | null
 }
 
+export interface Installment {
+  number: number
+  /** `YYYY-MM-DD` */
+  dueDate: string
+  amount: number
+  paid: boolean
+  nfIssued: boolean
+}
+
 export interface Project {
   id: string
   name: string
@@ -32,4 +41,21 @@ export interface Project {
   nextDate: string | null
   /** NF do próximo pagamento já emitida. */
   nf: boolean
+  /** Quantas parcelas já tiveram NF emitida. */
+  nfCount: number
+  installmentCount: number
+  /** Número da primeira parcela em aberto; null se o contrato está quitado. */
+  nextNumber: number | null
+}
+
+export interface ProjectDetail extends Project {
+  installments: Installment[]
+}
+
+export interface ProjectInput {
+  name: string
+  description: string
+  po: string
+  product: Product
+  running: boolean
 }

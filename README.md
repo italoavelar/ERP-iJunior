@@ -48,8 +48,10 @@ Base: `http://localhost:3333`
 | POST | `/api/activities/:id/toggle` | Alterna concluída/aberta |
 | DELETE | `/api/activities/:id` | Remove atividade |
 | GET | `/api/projects?status=running\|finished` | Lista projetos |
-| GET | `/api/projects/:id` | Detalhe do projeto |
-| PATCH | `/api/projects/:id/nf` | Marca a NF do próximo pagamento (`{ "issued": boolean }`) |
+| GET | `/api/projects/:id` | Detalhe do projeto, com o plano de parcelas |
+| PATCH | `/api/projects/:id` | Edita nome, descrição, P.O., produto e situação |
+| PATCH | `/api/projects/:id/nf` | Marca a NF da primeira parcela em aberto (`{ "issued": boolean }`) |
+| PATCH | `/api/projects/:id/installments/:number/nf` | Marca a NF de uma parcela específica |
 
 Erros saem como `{ "error": "…" }`; falhas de validação incluem `issues` com o campo e a mensagem.
 

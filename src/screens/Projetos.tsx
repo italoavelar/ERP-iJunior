@@ -1,21 +1,36 @@
 import { useState } from 'react'
 import { Chip, ProgressBar } from '../components/primitives'
 import { Sheet } from '../components/Overlay'
-import { IconClose } from '../components/Icons'
+import { ProjetoForm } from '../components/ProjetoForm'
+import { ParcelasSheet } from '../components/ParcelasSheet'
+import { IconClose, IconEdit } from '../components/Icons'
 import { nfTone, pctOf, productTone } from '../lib/tone'
 import type { Project } from '../lib/types'
 import { BRL, fmtDate } from '../lib/format'
 
 type Tab = 'execucao' | 'finalizados'
 
-export function Projetos({ desktop, projects }: { desktop: boolean; projects: Project[] }) {
+export function Projetos({
+  desktop,
+  projects,
+  onUpdated,
+  onToast,
+}: {
+  desktop: boolean
+  projects: Project[]
+  onUpdated: (p: Project) => void
+  onToast: (title: string, body: string, tone?: string) => void
+}) {
   const [tab, setTab] = useState<Tab>('execucao')
   const [openId, setOpenId] = useState<string | null>(null)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [parcelasId, setParcelasId] = useState<string | null>(null)
 
   const running = projects.filter((p) => p.running)
   const finished = projects.filter((p) => !p.running)
   const shown = tab === 'execucao' ? running : finished
   const open = projects.find((p) => p.id === openId) ?? null
+  const editing = projects.find((p) => p.id === editId) ?? null
 
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: 'execucao', label: 'Em execução', count: running.length },
@@ -122,7 +137,38 @@ export function Projetos({ desktop, projects }: { desktop: boolean; projects: Pr
                 {p.product}
               </span>
             </div>
-            <div style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 8 }}>P.O. {p.po}</div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 8,
+                marginTop: 8,
+              }}
+            >
+              <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>P.O. {p.po}</span>
+              <span
+                role="button"
+                tabIndex={0}
+                aria-label={`Editar ${p.name}`}
+                title="Editar projeto"
+                className="icon-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setEditId(p.id)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setEditId(p.id)
+                  }
+                }}
+                style={{ width: 28, height: 28, flex: 'none' }}
+              >
+                <IconEdit size={15} />
+              </span>
+            </div>
             <div style={{ marginTop: 14 }}>
               <ProgressBar pct={pctOf(p)} height={8} />
             </div>
@@ -144,7 +190,38 @@ export function Projetos({ desktop, projects }: { desktop: boolean; projects: Pr
         ))}
       </div>
 
-      {open && <ProjectDetail project={open} desktop={desktop} onClose={() => setOpenId(null)} />}
+      {open && (
+        <ProjectDetail
+          project={open}
+          desktop={desktop}
+          onClose={() => setOpenId(null)}
+          onEdit={() => {
+            setEditId(open.id)
+            setOpenId(null)
+          }}
+          onParcelas={() => setParcelasId(open.id)}
+        />
+      )}
+
+      {editing && (
+        <ProjetoForm
+          project={editing}
+          desktop={desktop}
+          onClose={() => setEditId(null)}
+          onUpdated={onUpdated}
+          onToast={onToast}
+        />
+      )}
+
+      {parcelasId && (
+        <ParcelasSheet
+          projectId={parcelasId}
+          desktop={desktop}
+          onClose={() => setParcelasId(null)}
+          onUpdated={onUpdated}
+          onToast={onToast}
+        />
+      )}
     </div>
   )
 }
@@ -153,10 +230,14 @@ function ProjectDetail({
   project: p,
   desktop,
   onClose,
+  onEdit,
+  onParcelas,
 }: {
   project: Project
   desktop: boolean
   onClose: () => void
+  onEdit: () => void
+  onParcelas: () => void
 }) {
   const nf = p.nf
   const box = (label: string, value: string, accent?: boolean) => (
@@ -286,6 +367,16 @@ function ProjectDetail({
         >
           {nf ? 'NF emitida' : 'Sem NF'}
         </span>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button className="btn-ghost" onClick={onParcelas} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
+          Ver parcelas ({p.nfCount}/{p.installmentCount} NFs)
+        </button>
+        <button className="btn-primary" onClick={onEdit} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
+          <IconEdit />
+          Editar projeto
+        </button>
       </div>
     </Sheet>
   )

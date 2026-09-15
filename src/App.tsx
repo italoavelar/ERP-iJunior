@@ -38,10 +38,14 @@ export default function App() {
   // altera o mesmo registro que o detalhe do projeto exibe.
   const projects = useAsync<Project[]>(() => api.projects.list())
 
+  /** Uma tela mexeu num projeto: reflete na lista que as duas compartilham. */
+  const applyProject = (updated: Project) =>
+    projects.set((cur) => cur.map((p) => (p.id === updated.id ? updated : p)))
+
   const toggleNF = async (id: string, issued: boolean) => {
     try {
       const updated = await api.projects.setNF(id, issued)
-      projects.set((cur) => cur.map((p) => (p.id === updated.id ? updated : p)))
+      applyProject(updated)
       show(issued ? 'NF marcada como emitida' : 'NF desmarcada', updated.name)
     } catch (e) {
       show('Não deu para atualizar', e instanceof Error ? e.message : String(e), 'var(--destructive)')
@@ -242,10 +246,21 @@ export default function App() {
             ) : (
               <>
                 {screen === 'projetos' && (
-                  <Projetos desktop={desktop} projects={projects.data ?? []} />
+                  <Projetos
+                    desktop={desktop}
+                    projects={projects.data ?? []}
+                    onUpdated={applyProject}
+                    onToast={show}
+                  />
                 )}
                 {screen === 'notas' && (
-                  <NotasFiscais projects={projects.data ?? []} onToggle={toggleNF} />
+                  <NotasFiscais
+                    projects={projects.data ?? []}
+                    desktop={desktop}
+                    onToggle={toggleNF}
+                    onUpdated={applyProject}
+                    onToast={show}
+                  />
                 )}
               </>
             ))}

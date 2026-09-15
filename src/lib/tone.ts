@@ -13,3 +13,10 @@ export const nfTone = (has: boolean): Tone =>
     : ['var(--muted)', 'var(--mutedfg)']
 
 export const pctOf = (p: Project) => Math.round((p.paid / p.total) * 100) + '%'
+
+export const statusTone = (status: 'Paga' | 'Vencida' | 'A vencer'): Tone => {
+  if (status === 'Paga') return ['color-mix(in oklch,var(--blue) 14%,transparent)', 'var(--blue)']
+  if (status === 'Vencida')
+    return ['color-mix(in oklch,var(--destructive) 12%,transparent)', 'var(--destructive)']
+  return ['color-mix(in oklch,var(--primary) 12%,transparent)', 'var(--primary)']
+}
