@@ -62,6 +62,31 @@ projectsRouter.patch('/:id/installments/:number/nf', async (req, res) => {
   res.json(await service.setInstallmentNF(id, number, issued))
 })
 
+const replanBody = z
+  .object({
+    total: z.number().positive('O preço total precisa ser maior que zero.'),
+    count: z
+      .number()
+      .int('O número de parcelas precisa ser inteiro.')
+      .min(1, 'O plano precisa de ao menos uma parcela.')
+      .max(120, 'No máximo 120 parcelas.'),
+    firstDueDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Informe o primeiro vencimento.'),
+    paidCount: z.number().int().min(0, 'Não dá para ter parcelas pagas negativas.'),
+  })
+  .refine((v) => v.paidCount <= v.count, {
+    path: ['paidCount'],
+    message: 'Não dá para ter mais parcelas pagas do que parcelas.',
+  })
+
+/** Refaz o plano: preço, número de parcelas, primeiro vencimento e pagas. */
+projectsRouter.put('/:id/installments', async (req, res) => {
+  const { id } = idParam.parse(req.params)
+  const input = replanBody.parse(req.body)
+  res.json(await service.replan(id, input))
+})
+
 /** Pagamento, NF ou valor de uma parcela. */
 projectsRouter.patch('/:id/installments/:number', async (req, res) => {
   const { id, number } = installmentParams.parse(req.params)

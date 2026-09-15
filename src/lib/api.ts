@@ -81,6 +81,15 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify({ issued }),
       }),
+    /** Refaz o plano: preço, número de parcelas, primeiro vencimento e pagas. */
+    replan: (
+      id: string,
+      input: { total: number; count: number; firstDueDate: string; paidCount: number },
+    ) =>
+      request<ProjectDetail>(`/api/projects/${id}/installments`, {
+        method: 'PUT',
+        body: JSON.stringify(input),
+      }),
     updateInstallment: (
       id: string,
       number: number,

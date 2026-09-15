@@ -1,6 +1,7 @@
 import { prisma } from '../../lib/prisma.js'
-import { toISODate, toNumber } from '../../lib/serialize.js'
+import { toISODate, toNumber, fromISODate } from '../../lib/serialize.js'
 import { notFound } from '../../lib/httpError.js'
+import { addMonths, split } from '../../lib/plan.js'
 
 const withInstallments = {
   include: { installments: { orderBy: { number: 'asc' } } },
@@ -112,4 +113,46 @@ export async function setNextNF(projectId: string, issued: boolean) {
   })
   if (!next) throw notFound('Parcela em aberto')
   return setInstallmentNF(projectId, next.number, issued)
+}
+
+/**
+ * Refaz o plano de parcelas: preço, número de parcelas, primeiro vencimento e
+ * quantas já foram pagas. É a forma de mexer no total e no que falta pagar,
+ * já que os dois são somados das parcelas.
+ *
+ * A NF de uma parcela é preservada quando o número dela sobrevive ao novo
+ * plano; parcelas novas nascem sem NF.
+ */
+export async function replan(
+  projectId: string,
+  input: { total: number; count: number; firstDueDate: string; paidCount: number },
+) {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: { installments: true },
+  })
+  if (!project) throw notFound('Projeto')
+
+  const previousNF = new Map(project.installments.map((i) => [i.number, i.nfIssued]))
+  const amounts = split(input.total, input.count)
+
+  const rows = amounts.map((amount, idx) => {
+    const number = idx + 1
+    const paid = number <= input.paidCount
+    return {
+      projectId,
+      number,
+      dueDate: fromISODate(addMonths(input.firstDueDate, idx)),
+      amount,
+      paid,
+      nfIssued: previousNF.get(number) ?? false,
+    }
+  })
+
+  await prisma.$transaction([
+    prisma.installment.deleteMany({ where: { projectId } }),
+    prisma.installment.createMany({ data: rows }),
+  ])
+
+  return getProject(projectId)
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Sheet } from './Overlay'
+import { ReplanejarForm } from './ReplanejarForm'
 import { ErrorState, Loading, ProgressBar } from './primitives'
 import { api } from '../lib/api'
 import { BRL, fmtDate, installmentStatus, parseAmount } from '../lib/format'
@@ -28,10 +29,12 @@ export function ParcelasSheet({
   const [busy, setBusy] = useState<number | null>(null)
   const [editing, setEditing] = useState<number | null>(null)
   const [amountDraft, setAmountDraft] = useState('')
+  const [replanning, setReplanning] = useState(false)
 
   const load = () => {
     setError(null)
     setDetail(null)
+    setReplanning(false)
     api.projects
       .get(projectId)
       .then(setDetail)
@@ -88,12 +91,29 @@ export function ParcelasSheet({
       desktop={desktop}
       width={desktop ? 700 : 460}
       title={detail?.name ?? 'Parcelas'}
-      subtitle={detail ? `${detail.product} · P.O. ${detail.po}` : undefined}
+      subtitle={
+        detail
+          ? replanning
+            ? 'Preço, número de parcelas e quanto já foi pago'
+            : `${detail.product} · P.O. ${detail.po}`
+          : undefined
+      }
     >
       {error ? (
         <ErrorState message={error} onRetry={load} />
       ) : !detail ? (
         <Loading label="Carregando parcelas…" />
+      ) : replanning ? (
+        <ReplanejarForm
+          detail={detail}
+          onCancel={() => setReplanning(false)}
+          onToast={onToast}
+          onDone={(updated) => {
+            setDetail(updated)
+            onUpdated(updated)
+            setReplanning(false)
+          }}
+        />
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
@@ -242,6 +262,14 @@ export function ParcelasSheet({
             Clique no valor para editá-lo, e nas etiquetas para alternar pagamento e NF. O total
             contratado e o valor pago são somados a partir daqui.
           </p>
+
+          <button
+            className="btn-ghost"
+            onClick={() => setReplanning(true)}
+            style={{ height: 42, fontSize: 13.5 }}
+          >
+            Alterar preço, número de parcelas ou vencimentos
+          </button>
         </>
       )}
     </Sheet>
