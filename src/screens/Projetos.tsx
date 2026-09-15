@@ -2,19 +2,20 @@ import { useState } from 'react'
 import { Chip, ProgressBar } from '../components/primitives'
 import { Sheet } from '../components/Overlay'
 import { IconClose } from '../components/Icons'
-import { PROJECTS, nfTone, pctOf, productTone, type Project } from '../data/projects'
+import { nfTone, pctOf, productTone } from '../lib/tone'
+import type { Project } from '../lib/types'
 import { BRL, fmtDate } from '../lib/format'
 
 type Tab = 'execucao' | 'finalizados'
 
-export function Projetos({ desktop, nf }: { desktop: boolean; nf: Record<string, boolean> }) {
+export function Projetos({ desktop, projects }: { desktop: boolean; projects: Project[] }) {
   const [tab, setTab] = useState<Tab>('execucao')
   const [openId, setOpenId] = useState<string | null>(null)
 
-  const running = PROJECTS.filter((p) => p.running)
-  const finished = PROJECTS.filter((p) => !p.running)
+  const running = projects.filter((p) => p.running)
+  const finished = projects.filter((p) => !p.running)
   const shown = tab === 'execucao' ? running : finished
-  const open = PROJECTS.find((p) => p.id === openId) ?? null
+  const open = projects.find((p) => p.id === openId) ?? null
 
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: 'execucao', label: 'Em execução', count: running.length },
@@ -143,7 +144,7 @@ export function Projetos({ desktop, nf }: { desktop: boolean; nf: Record<string,
         ))}
       </div>
 
-      {open && <ProjectDetail project={open} desktop={desktop} nf={nf[open.id]} onClose={() => setOpenId(null)} />}
+      {open && <ProjectDetail project={open} desktop={desktop} onClose={() => setOpenId(null)} />}
     </div>
   )
 }
@@ -151,14 +152,13 @@ export function Projetos({ desktop, nf }: { desktop: boolean; nf: Record<string,
 function ProjectDetail({
   project: p,
   desktop,
-  nf,
   onClose,
 }: {
   project: Project
   desktop: boolean
-  nf: boolean
   onClose: () => void
 }) {
+  const nf = p.nf
   const box = (label: string, value: string, accent?: boolean) => (
     <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: 'var(--mutedfg)' }}>{label}</div>

@@ -1,5 +1,7 @@
-import { PROJECTS, nfTone } from '../data/projects'
+import { useState } from 'react'
+import { nfTone } from '../lib/tone'
 import { daysTo, fmtDate } from '../lib/format'
+import type { Project } from '../lib/types'
 
 /** Texto e cor do vencimento a partir da distância em dias. */
 const due = (iso: string) => {
@@ -10,15 +12,26 @@ const due = (iso: string) => {
 }
 
 export function NotasFiscais({
-  nf,
+  projects,
   onToggle,
 }: {
-  nf: Record<string, boolean>
-  onToggle: (id: string) => void
+  projects: Project[]
+  onToggle: (id: string, issued: boolean) => Promise<void>
 }) {
+  const [busyId, setBusyId] = useState<string | null>(null)
+
   // Só projetos em execução têm próximo pagamento a controlar.
-  const rows = PROJECTS.filter((p) => p.running)
-  const semNF = rows.filter((p) => !nf[p.id]).length
+  const rows = projects.filter((p) => p.running)
+  const semNF = rows.filter((p) => !p.nf).length
+
+  const handle = async (id: string, issued: boolean) => {
+    setBusyId(id)
+    try {
+      await onToggle(id, issued)
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <div>
@@ -43,7 +56,7 @@ export function NotasFiscais({
             </thead>
             <tbody>
               {rows.map((p) => {
-                const has = nf[p.id]
+                const has = p.nf
                 const d = due(p.nextDate!)
                 return (
                   <tr key={p.id}>
@@ -73,7 +86,8 @@ export function NotasFiscais({
                     <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                       <button
                         className="btn-ghost"
-                        onClick={() => onToggle(p.id)}
+                        onClick={() => void handle(p.id, !has)}
+                        disabled={busyId === p.id}
                         style={{ height: 32, padding: '0 12px', fontSize: 12.5, borderRadius: 9, whiteSpace: 'nowrap' }}
                       >
                         {has ? 'Marcar sem NF' : 'Marcar emitida'}

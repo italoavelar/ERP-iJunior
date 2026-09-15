@@ -65,7 +65,10 @@ Erros saem como `{ "error": "…" }`; falhas de validação incluem `issues` com
 | `npm run db:seed` | Popula o banco (idempotente) |
 | `npm run db:studio` | Abre o Prisma Studio |
 
-## Estado atual
+## Front-end e API
 
-O front-end ainda lê de `src/data/`, com dados fixos. A API já serve os mesmos
-dados no mesmo formato — ligar as telas a ela é o próximo passo.
+As telas consomem a API por `src/lib/api.ts`. A URL vem de `VITE_API_URL`
+(veja `.env.example`); sem ela, o padrão é `http://localhost:3333`.
+
+Com a API fora do ar, cada tela mostra o erro com um botão de recarregar, em
+vez de aparentar uma lista vazia.

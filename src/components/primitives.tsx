@@ -88,3 +88,60 @@ export function EmptyState({
     </Card>
   )
 }
+
+export function Loading({ label = 'Carregando…' }: { label?: string }) {
+  return (
+    <div
+      role="status"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '40px 0',
+        color: 'var(--mutedfg)',
+        fontSize: 13.5,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 16,
+          height: 16,
+          borderRadius: '50%',
+          border: '2px solid var(--border)',
+          borderTopColor: 'var(--primary)',
+          animation: 'spin 700ms linear infinite',
+        }}
+      />
+      {label}
+    </div>
+  )
+}
+
+export function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Card
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: 10,
+        padding: '40px 24px',
+        borderColor: 'color-mix(in oklch,var(--destructive) 35%,var(--border))',
+      }}
+    >
+      <div style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16 }}>
+        Não deu para carregar
+      </div>
+      <div style={{ fontSize: 13.5, color: 'var(--mutedfg)', maxWidth: 420 }}>{message}</div>
+      <button
+        className="btn-ghost"
+        onClick={onRetry}
+        style={{ marginTop: 4, height: 38, padding: '0 16px', fontSize: 13.5 }}
+      >
+        Tentar de novo
+      </button>
+    </Card>
+  )
+}

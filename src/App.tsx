@@ -4,7 +4,10 @@ import { Toast } from './components/Toast'
 import { Atividades } from './screens/Atividades'
 import { Projetos } from './screens/Projetos'
 import { NotasFiscais } from './screens/NotasFiscais'
-import { PROJECTS } from './data/projects'
+import { ErrorState, Loading } from './components/primitives'
+import { api } from './lib/api'
+import { useAsync } from './hooks/useAsync'
+import type { Project } from './lib/types'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { useTheme } from './hooks/useTheme'
 import { useToast } from './hooks/useToast'
@@ -23,9 +26,6 @@ const NAV: { key: Screen; label: string; icon: ReactNode }[] = [
   { key: 'notas', label: 'Notas fiscais', icon: <IconNF /> },
 ]
 
-const initialNF = () =>
-  PROJECTS.reduce<Record<string, boolean>>((acc, p) => ((acc[p.id] = p.nf), acc), {})
-
 export default function App() {
   const desktop = useMediaQuery('(min-width: 900px)')
   const { dark, toggle } = useTheme()
@@ -33,14 +33,19 @@ export default function App() {
 
   const [screen, setScreen] = useState<Screen>('atividades')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  // Estado de NF partilhado: a tabela alterna, o detalhe do projeto lê.
-  const [nf, setNf] = useState(initialNF)
 
-  const toggleNF = (id: string) => {
-    const wasEmitted = nf[id]
-    setNf((s) => ({ ...s, [id]: !s[id] }))
-    const project = PROJECTS.find((p) => p.id === id)
-    show(wasEmitted ? 'NF desmarcada' : 'NF marcada como emitida', project?.name ?? '')
+  // Projetos vivem aqui porque duas telas os compartilham: a tabela de NFs
+  // altera o mesmo registro que o detalhe do projeto exibe.
+  const projects = useAsync<Project[]>(() => api.projects.list())
+
+  const toggleNF = async (id: string, issued: boolean) => {
+    try {
+      const updated = await api.projects.setNF(id, issued)
+      projects.set((cur) => cur.map((p) => (p.id === updated.id ? updated : p)))
+      show(issued ? 'NF marcada como emitida' : 'NF desmarcada', updated.name)
+    } catch (e) {
+      show('Não deu para atualizar', e instanceof Error ? e.message : String(e), 'var(--destructive)')
+    }
   }
 
   return (
@@ -228,8 +233,22 @@ export default function App() {
           }}
         >
           {screen === 'atividades' && <Atividades desktop={desktop} onToast={show} />}
-          {screen === 'projetos' && <Projetos desktop={desktop} nf={nf} />}
-          {screen === 'notas' && <NotasFiscais nf={nf} onToggle={toggleNF} />}
+
+          {screen !== 'atividades' &&
+            (projects.error ? (
+              <ErrorState message={projects.error} onRetry={projects.reload} />
+            ) : projects.loading ? (
+              <Loading label="Carregando projetos…" />
+            ) : (
+              <>
+                {screen === 'projetos' && (
+                  <Projetos desktop={desktop} projects={projects.data ?? []} />
+                )}
+                {screen === 'notas' && (
+                  <NotasFiscais projects={projects.data ?? []} onToggle={toggleNF} />
+                )}
+              </>
+            ))}
         </main>
       </div>
 
