@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Product {
+  LOOP
+  START
+}
+
+/// Membro do time que pode ser responsável por atividades.
+model Person {
+  id       String @id @default(cuid())
+  name     String
+  initials String
+
+  activities Activity[] @relation("ActivityAssignees")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("people")
+}
+
+/// Atividade do time financeiro.
+model Activity {
+  id      String  @id @default(cuid())
+  title   String
+  details String  @default("")
+  done    Boolean @default(false)
+  /// Preenchido quando `done` vira true; zerado ao reabrir.
+  doneAt  DateTime? @db.Date
+
+  assignees Person[] @relation("ActivityAssignees")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([done])
+  @@map("activities")
+}
+
+/// Projeto contratado, com o acompanhamento financeiro.
+model Project {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  product     Product
+  /// P.O. (gerente) responsável pelo projeto.
+  po          String
+  running     Boolean @default(true)
+
+  /// Decimal em vez de float: valores monetários não toleram erro de ponto flutuante.
+  total Decimal @db.Decimal(12, 2)
+  paid  Decimal @db.Decimal(12, 2)
+
+  /// Vencimento do próximo pagamento; null quando o contrato está quitado.
+  nextDate DateTime? @db.Date
+  /// NF do próximo pagamento já emitida.
+  nfIssued Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([running])
+  @@map("projects")
+}
