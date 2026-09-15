@@ -81,5 +81,14 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify({ issued }),
       }),
+    updateInstallment: (
+      id: string,
+      number: number,
+      data: { paid?: boolean; nfIssued?: boolean; amount?: number },
+    ) =>
+      request<ProjectDetail>(`/api/projects/${id}/installments/${number}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
   },
 }

@@ -54,10 +54,9 @@ model Project {
   po          String
   running     Boolean @default(true)
 
-  /// Decimal em vez de float: valores monetários não toleram erro de ponto flutuante.
-  total Decimal @db.Decimal(12, 2)
-  paid  Decimal @db.Decimal(12, 2)
-
+  /// Total contratado e valor pago são derivados das parcelas — ver
+  /// modules/projects/service.ts. Guardá-los aqui criaria um espelho que
+  /// diverge do plano na primeira edição.
   installments Installment[]
 
   createdAt DateTime @default(now())

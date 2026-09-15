@@ -108,8 +108,6 @@ async function main() {
       product: p.product,
       po: p.po,
       running: p.running,
-      total: p.total,
-      paid: p.paid,
     }
     await prisma.project.upsert({ where: { id: p.id }, update: data, create: { id: p.id, ...data } })
 

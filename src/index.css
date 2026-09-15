@@ -73,15 +73,6 @@ a:hover {
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: none;
-  }
-}
-
 @keyframes pop {
   from {
     opacity: 0;

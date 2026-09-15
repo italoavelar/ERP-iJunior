@@ -24,6 +24,10 @@ const serializeInstallment = (i: ProjectRow['installments'][number]) => ({
  */
 function summarize(p: ProjectRow) {
   const next = p.installments.find((i) => !i.paid) ?? null
+  // Somar em centavos evita o arredondamento de ponto flutuante na soma.
+  const cents = (list: typeof p.installments) =>
+    list.reduce((acc, i) => acc + Math.round(toNumber(i.amount) * 100), 0) / 100
+
   return {
     id: p.id,
     name: p.name,
@@ -31,8 +35,8 @@ function summarize(p: ProjectRow) {
     product: p.product,
     po: p.po,
     running: p.running,
-    total: toNumber(p.total),
-    paid: toNumber(p.paid),
+    total: cents(p.installments),
+    paid: cents(p.installments.filter((i) => i.paid)),
     nextDate: next ? toISODate(next.dueDate) : null,
     /// NF do próximo pagamento; num contrato quitado, se todas foram emitidas.
     nf: next ? next.nfIssued : p.installments.every((i) => i.nfIssued),
@@ -78,8 +82,12 @@ export async function updateProject(
   return serializeDetail(row)
 }
 
-/** Marca/desmarca a NF de uma parcela específica. */
-export async function setInstallmentNF(projectId: string, number: number, issued: boolean) {
+/** Edita uma parcela: pagamento, NF ou valor. Total e pago do projeto saem daqui. */
+export async function updateInstallment(
+  projectId: string,
+  number: number,
+  data: { paid?: boolean; nfIssued?: boolean; amount?: number },
+) {
   const existing = await prisma.installment.findUnique({
     where: { projectId_number: { projectId, number } },
   })
@@ -87,10 +95,14 @@ export async function setInstallmentNF(projectId: string, number: number, issued
 
   await prisma.installment.update({
     where: { projectId_number: { projectId, number } },
-    data: { nfIssued: issued },
+    data,
   })
   return getProject(projectId)
 }
+
+/** Marca/desmarca a NF de uma parcela específica. */
+export const setInstallmentNF = (projectId: string, number: number, issued: boolean) =>
+  updateInstallment(projectId, number, { nfIssued: issued })
 
 /** Atalho da tabela: age sobre a NF da primeira parcela em aberto. */
 export async function setNextNF(projectId: string, issued: boolean) {

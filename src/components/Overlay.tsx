@@ -12,7 +12,7 @@ function useEscape(onClose: () => void) {
   }, [onClose])
 }
 
-/** Sheet lateral no desktop, modal centralizado no mobile — como no design. */
+/** Modal centralizado. */
 export function Sheet({
   open,
   onClose,
@@ -49,9 +49,9 @@ export function Sheet({
         zIndex: 70,
         background: 'rgba(8,24,27,.45)',
         display: 'flex',
-        alignItems: desktop ? 'stretch' : 'center',
-        justifyContent: desktop ? 'flex-end' : 'center',
-        padding: desktop ? 0 : 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: desktop ? 24 : 16,
       }}
     >
       <div
@@ -66,10 +66,10 @@ export function Sheet({
           overflow: 'auto',
           background: 'var(--card)',
           border: '1px solid var(--border)',
-          borderRadius: desktop ? 0 : 16,
+          borderRadius: 16,
           padding: 22,
           boxShadow: 'var(--shadow)',
-          animation: desktop ? 'slideIn 220ms ease both' : 'pop 160ms ease both',
+          animation: 'pop 160ms ease both',
         }}
       >
         {!hideHeader && (

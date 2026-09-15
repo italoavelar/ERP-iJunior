@@ -18,3 +18,14 @@ export const installmentStatus = (paid: boolean, dueDate: string) => {
   if (paid) return 'Paga' as const
   return daysTo(dueDate) < 0 ? ('Vencida' as const) : ('A vencer' as const)
 }
+
+/** Lê um valor digitado em pt-BR ("1.234,56") ou com ponto decimal. */
+export const parseAmount = (s: string) => {
+  const cleaned = s.replace(/[^\d.,-]/g, '').trim()
+  if (!cleaned) return NaN
+  // Com vírgula, ela é o separador decimal e os pontos são de milhar.
+  const normalized = cleaned.includes(',')
+    ? cleaned.replace(/\./g, '').replace(',', '.')
+    : cleaned
+  return Number(normalized)
+}

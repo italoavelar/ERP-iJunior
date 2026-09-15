@@ -24,6 +24,15 @@ const updateBody = z
 
 const nfBody = z.object({ issued: z.boolean() })
 
+const installmentBody = z
+  .object({
+    paid: z.boolean(),
+    nfIssued: z.boolean(),
+    amount: z.number().positive('O valor da parcela precisa ser maior que zero.'),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, { message: 'Envie ao menos um campo.' })
+
 projectsRouter.get('/', async (req, res) => {
   const { status } = listQuery.parse(req.query)
   res.json(await service.listProjects(status))
@@ -51,4 +60,11 @@ projectsRouter.patch('/:id/installments/:number/nf', async (req, res) => {
   const { id, number } = installmentParams.parse(req.params)
   const { issued } = nfBody.parse(req.body)
   res.json(await service.setInstallmentNF(id, number, issued))
+})
+
+/** Pagamento, NF ou valor de uma parcela. */
+projectsRouter.patch('/:id/installments/:number', async (req, res) => {
+  const { id, number } = installmentParams.parse(req.params)
+  const data = installmentBody.parse(req.body)
+  res.json(await service.updateInstallment(id, number, data))
 })
