@@ -1,0 +1,562 @@
+import { useState } from 'react'
+import { Chip, EmptyState, ProgressBar } from '../components/primitives'
+import { ConfirmDialog, Sheet } from '../components/Overlay'
+import { ProjetoForm } from '../components/ProjetoForm'
+import { ParcelasSheet } from '../components/ParcelasSheet'
+import { IconClose, IconEdit, IconTrash } from '../components/Icons'
+import { pctOf, productTone } from '../lib/tone'
+import { api } from '../lib/api'
+import type { Project } from '../lib/types'
+import { BRL, dueLabel, fmtDate } from '../lib/format'
+
+type Tab = 'pendentes' | 'finalizados'
+
+/** Ainda há parcela em aberto. */
+const isPending = (p: Project) => p.nextNumber !== null
+
+/** Ordem de cobrança: com data primeiro (as vencidas no topo), depois as que
+ *  dependem de marco. */
+const urgency = (p: Project) => (p.nextDate ? `1${p.nextDate}` : `2${p.name}`)
+
+const isOverdue = (p: Project) => !!p.nextDate && dueLabel(p.nextDate).tone === 'var(--destructive)'
+
+/** Próximo pagamento em texto, inclusive quando ele depende de um marco. */
+const nextPayment = (p: Project) => {
+  if (!isPending(p)) return 'contrato quitado'
+  if (p.nextDate) return `próximo pagamento em ${fmtDate(p.nextDate)}`
+  if (p.nextSprint) return `próximo pagamento após a Sprint ${p.nextSprint}`
+  return `próximo: ${p.nextDescription || 'parcela'} (data a definir)`
+}
+
+const ProductTag = ({ product }: { product: Project['product'] }) =>
+  product ? (
+    <span
+      className="chip"
+      style={{
+        flex: 'none',
+        borderRadius: 7,
+        fontWeight: 700,
+        letterSpacing: '.03em',
+        background: productTone(product)[0],
+        color: productTone(product)[1],
+      }}
+    >
+      {product}
+    </span>
+  ) : null
+
+/** Linha do card com o próximo pagamento e quanto falta. */
+function NextLine({ p }: { p: Project }) {
+  if (!isPending(p)) {
+    return (
+      <div style={{ fontSize: 12.5, color: 'var(--primary)', fontWeight: 600 }}>
+        Quitado
+        <span style={{ color: 'var(--mutedfg)', fontWeight: 400 }}>
+          {' '}
+          · {p.installmentCount} {p.installmentCount === 1 ? 'parcela paga' : 'parcelas pagas'}
+        </span>
+      </div>
+    )
+  }
+
+  const d = p.nextDate ? dueLabel(p.nextDate) : null
+  return (
+    <div style={{ fontSize: 12.5, color: 'var(--mutedfg)', lineHeight: 1.5 }}>
+      <div>
+        Próximo:{' '}
+        {d ? (
+          <>
+            <span className="num" style={{ color: 'var(--fg)', fontWeight: 600 }}>
+              {fmtDate(p.nextDate)}
+            </span>{' '}
+            <span style={{ color: d.tone }}>({d.label})</span>
+          </>
+        ) : p.nextSprint ? (
+          <span style={{ color: 'var(--amber)', fontWeight: 600 }}>após a Sprint {p.nextSprint}</span>
+        ) : (
+          <span style={{ color: 'var(--fg)' }}>{p.nextDescription || 'parcela'} · data a definir</span>
+        )}
+      </div>
+      <div>
+        Falta{' '}
+        <span className="num" style={{ color: 'var(--fg)', fontWeight: 600 }}>
+          {BRL(p.total - p.paid)}
+        </span>{' '}
+        · {p.paidCount} de {p.installmentCount} parcelas pagas
+      </div>
+    </div>
+  )
+}
+
+export function Projetos({
+  desktop,
+  projects,
+  onUpdated,
+  onRemoved,
+  onToast,
+}: {
+  desktop: boolean
+  projects: Project[]
+  onUpdated: (p: Project) => void
+  onRemoved: (id: string) => void
+  onToast: (title: string, body: string, tone?: string) => void
+}) {
+  const [tab, setTab] = useState<Tab>('pendentes')
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [parcelasId, setParcelasId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const pending = projects.filter(isPending).sort((a, b) => urgency(a).localeCompare(urgency(b)))
+  const settled = projects.filter((p) => !isPending(p)).sort((a, b) => a.name.localeCompare(b.name))
+  const shown = tab === 'pendentes' ? pending : settled
+  const overdue = pending.filter(isOverdue)
+  const owed = pending.reduce((acc, p) => acc + Math.round((p.total - p.paid) * 100), 0) / 100
+  const open = projects.find((p) => p.id === openId) ?? null
+  const editing = projects.find((p) => p.id === editId) ?? null
+  const toDelete = projects.find((p) => p.id === deleteId) ?? null
+
+  const confirmDelete = async () => {
+    if (!toDelete || deleting) return
+    setDeleting(true)
+    try {
+      await api.projects.remove(toDelete.id)
+      onRemoved(toDelete.id)
+      setOpenId(null)
+      onToast('Projeto excluído', `${toDelete.name} e suas parcelas foram apagados.`, 'var(--destructive)')
+    } catch (e) {
+      onToast('Não deu para excluir', e instanceof Error ? e.message : String(e), 'var(--destructive)')
+    } finally {
+      setDeleting(false)
+      setDeleteId(null)
+    }
+  }
+
+  const tabs: { key: Tab; label: string; count: number }[] = [
+    { key: 'pendentes', label: 'Pagamentos pendentes', count: pending.length },
+    { key: 'finalizados', label: 'Pagamentos finalizados', count: settled.length },
+  ]
+
+  return (
+    <div>
+      <h1 className="display" style={{ fontSize: 31 }}>
+        Projetos
+      </h1>
+      <p style={{ margin: '8px 0 0', fontSize: 14, color: 'var(--mutedfg)' }}>
+        <span className="num">{BRL(owed)}</span> a receber em {pending.length}{' '}
+        {pending.length === 1 ? 'projeto' : 'projetos'}
+        {overdue.length > 0 && (
+          <>
+            {' · '}
+            <span style={{ color: 'var(--destructive)', fontWeight: 600 }}>
+              {overdue.length} com parcela vencida
+            </span>
+          </>
+        )}
+      </p>
+
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 6,
+          padding: 4,
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+          background: 'var(--card)',
+          marginTop: 22,
+          width: 'fit-content',
+          maxWidth: '100%',
+        }}
+      >
+        {tabs.map((t) => {
+          const active = tab === t.key
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              style={{
+                height: 36,
+                padding: '0 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                border: 0,
+                borderRadius: 9,
+                background: active ? 'color-mix(in oklch,var(--primary) 12%,transparent)' : 'transparent',
+                color: active ? 'var(--primary)' : 'var(--mutedfg)',
+                fontSize: 13.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {t.label}
+              <span
+                style={{
+                  minWidth: 22,
+                  height: 20,
+                  padding: '0 6px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  borderRadius: 99,
+                  background: active ? 'color-mix(in oklch,var(--primary) 18%,transparent)' : 'var(--muted)',
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                }}
+              >
+                {t.count}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {shown.length === 0 ? (
+        <div style={{ marginTop: 16 }}>
+          <EmptyState
+            title={tab === 'pendentes' ? 'Nenhum pagamento pendente' : 'Nenhum contrato quitado ainda'}
+            body={
+              tab === 'pendentes'
+                ? 'Todos os projetos estão com as parcelas pagas.'
+                : 'Quando um projeto tiver todas as parcelas pagas, ele aparece aqui.'
+            }
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: desktop ? 'repeat(3,minmax(0,1fr))' : '1fr',
+            gap: 14,
+            marginTop: 16,
+          }}
+        >
+          {shown.map((p) => (
+            <button
+              key={p.id}
+              className="card lift"
+              onClick={() => setOpenId(p.id)}
+              style={{
+                textAlign: 'left',
+                padding: 18,
+                cursor: 'pointer',
+                color: 'var(--fg)',
+                font: 'inherit',
+                display: 'flex',
+                flexDirection: 'column',
+                borderColor: isOverdue(p) ? 'color-mix(in oklch,var(--destructive) 45%,var(--border))' : undefined,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+                <span style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>
+                  {p.name}
+                </span>
+                <ProductTag product={p.product} />
+              </div>
+              {p.client && (
+                <div className="truncate" style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 4 }}>
+                  {p.client}
+                </div>
+              )}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginTop: 8,
+                }}
+              >
+                <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>
+                  {p.po ? `P.O. ${p.po}` : 'P.O. a definir'}
+                  {p.sprintCount > 0 && ` · Sprint ${p.lastValidatedSprint ?? 0}/${p.sprintCount}`}
+                </span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Editar ${p.name}`}
+                  title="Editar projeto"
+                  className="icon-btn"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setEditId(p.id)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setEditId(p.id)
+                    }
+                  }}
+                  style={{ width: 28, height: 28, flex: 'none' }}
+                >
+                  <IconEdit size={15} />
+                </span>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <ProgressBar pct={pctOf(p)} height={8} />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginTop: 8,
+                }}
+              >
+                <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>{pctOf(p)} pago</span>
+                <span className="num" style={{ fontSize: 13, fontWeight: 600 }}>
+                  {BRL(p.total)}
+                </span>
+              </div>
+              <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                <NextLine p={p} />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <ProjectDetail
+          project={open}
+          desktop={desktop}
+          onClose={() => setOpenId(null)}
+          onEdit={() => {
+            setEditId(open.id)
+            setOpenId(null)
+          }}
+          onParcelas={() => setParcelasId(open.id)}
+          onDelete={() => setDeleteId(open.id)}
+        />
+      )}
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onClose={() => setDeleteId(null)}
+        title={`Excluir ${toDelete?.name ?? 'projeto'}?`}
+        confirmLabel={deleting ? 'Excluindo…' : 'Excluir projeto'}
+        onConfirm={() => void confirmDelete()}
+      >
+        {toDelete && (
+          <>
+            <p style={{ margin: '12px 0 0', fontSize: 13.5, lineHeight: 1.55, color: 'var(--mutedfg)' }}>
+              Apaga o projeto junto com as {toDelete.installmentCount}{' '}
+              {toDelete.installmentCount === 1 ? 'parcela' : 'parcelas'}
+              {toDelete.sprintCount > 0 && ` e as ${toDelete.sprintCount} sprints`}. Esta ação não pode ser
+              desfeita.
+            </p>
+            {toDelete.paid > 0 && (
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  background: 'color-mix(in oklch,var(--destructive) 10%,transparent)',
+                  color: 'var(--destructive)',
+                }}
+              >
+                O registro de {BRL(toDelete.paid)} já recebidos ({toDelete.paidCount}{' '}
+                {toDelete.paidCount === 1 ? 'parcela paga' : 'parcelas pagas'}) também será apagado.
+              </div>
+            )}
+          </>
+        )}
+      </ConfirmDialog>
+
+      {editing && (
+        <ProjetoForm
+          project={editing}
+          desktop={desktop}
+          onClose={() => setEditId(null)}
+          onUpdated={onUpdated}
+          onToast={onToast}
+        />
+      )}
+
+      {parcelasId && (
+        <ParcelasSheet
+          projectId={parcelasId}
+          desktop={desktop}
+          onClose={() => setParcelasId(null)}
+          onUpdated={onUpdated}
+          onToast={onToast}
+        />
+      )}
+    </div>
+  )
+}
+
+function ProjectDetail({
+  project: p,
+  desktop,
+  onClose,
+  onEdit,
+  onParcelas,
+  onDelete,
+}: {
+  project: Project
+  desktop: boolean
+  onClose: () => void
+  onEdit: () => void
+  onParcelas: () => void
+  onDelete: () => void
+}) {
+  const box = (label: string, value: string, accent?: boolean) => (
+    <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+      <div style={{ fontSize: 11.5, color: 'var(--mutedfg)' }}>{label}</div>
+      <div
+        style={{
+          fontFamily: 'Sora, sans-serif',
+          fontWeight: 700,
+          fontSize: 17,
+          marginTop: 6,
+          color: accent ? 'var(--primary)' : undefined,
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  )
+
+  const d = p.nextDate ? dueLabel(p.nextDate) : null
+
+  return (
+    <Sheet open onClose={onClose} desktop={desktop} width={desktop ? 520 : 460} title={p.name} hideHeader>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 9 }}>
+            <h2 style={{ margin: 0, fontFamily: 'Sora, sans-serif', fontWeight: 800, fontSize: 22, lineHeight: 1.25 }}>
+              {p.name}
+            </h2>
+            <ProductTag product={p.product} />
+            <Chip
+              tone={
+                p.running
+                  ? ['color-mix(in oklch,var(--primary) 12%,transparent)', 'var(--primary)']
+                  : ['var(--muted)', 'var(--mutedfg)']
+              }
+            >
+              {p.running ? 'Em execução' : 'Finalizado'}
+            </Chip>
+          </div>
+          {p.client && (
+            <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 8 }}>
+              Contratante: <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.client}</span>
+            </div>
+          )}
+          <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 4 }}>
+            P.O. (gerente): <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.po || 'a definir'}</span>
+          </div>
+        </div>
+        <button className="icon-btn" onClick={onClose} aria-label="Fechar" style={{ width: 32, height: 32, flex: 'none' }}>
+          <IconClose />
+        </button>
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            letterSpacing: '.05em',
+            textTransform: 'uppercase',
+            color: 'var(--mutedfg)',
+          }}
+        >
+          Descrição
+        </div>
+        <p
+          style={{
+            margin: '8px 0 0',
+            fontSize: 13.5,
+            lineHeight: 1.6,
+            textWrap: 'pretty',
+            color: p.description ? undefined : 'var(--mutedfg)',
+          }}
+        >
+          {p.description || 'Sem descrição — use “Editar projeto” para preencher.'}
+        </p>
+      </div>
+
+      {p.notes && (
+        <div
+          style={{
+            fontSize: 13,
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: 'color-mix(in oklch,var(--amber) 10%,transparent)',
+            border: '1px solid color-mix(in oklch,var(--amber) 30%,transparent)',
+            lineHeight: 1.5,
+          }}
+        >
+          {p.notes}
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
+        {box('Preço total', BRL(p.total))}
+        {box('Já pago', BRL(p.paid), true)}
+        {box('Falta', BRL(p.total - p.paid))}
+      </div>
+
+      <div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            fontSize: 12.5,
+            color: 'var(--mutedfg)',
+          }}
+        >
+          <span>
+            {pctOf(p)} pago · {p.paidCount} de {p.installmentCount} parcelas
+          </span>
+          <span style={{ color: d?.tone }}>
+            {nextPayment(p)}
+            {d && ` (${d.label})`}
+          </span>
+        </div>
+        <div style={{ marginTop: 9 }}>
+          <ProgressBar pct={pctOf(p)} />
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button className="btn-ghost" onClick={onParcelas} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
+          {p.sprintCount > 0 ? 'Parcelas e sprints' : 'Ver parcelas'}
+        </button>
+        <button className="btn-primary" onClick={onEdit} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
+          <IconEdit />
+          Editar projeto
+        </button>
+      </div>
+
+      <button
+        onClick={onDelete}
+        style={{
+          alignSelf: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          border: 0,
+          background: 'transparent',
+          color: 'var(--destructive)',
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: 'pointer',
+          padding: '4px 8px',
+        }}
+      >
+        <IconTrash size={15} />
+        Excluir projeto
+      </button>
+    </Sheet>
+  )
+}
