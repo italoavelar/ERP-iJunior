@@ -89,3 +89,21 @@ export interface InstallmentPatch {
   dueDate?: string | null
   paidAt?: string | null
 }
+
+/** Parcela com o projeto a que pertence — usada nas visões que cruzam projetos. */
+export interface InstallmentRow {
+  projectId: string
+  projectName: string
+  client: string
+  running: boolean
+  number: number
+  /** Quantas parcelas o projeto tem. */
+  count: number
+  description: string
+  dueDate: string | null
+  amount: number
+  paid: boolean
+  paidAt: string | null
+  paidAmount: number | null
+  sprintNumber: number | null
+}

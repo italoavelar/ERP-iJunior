@@ -1,6 +1,7 @@
 import type {
   Activity,
   InstallmentPatch,
+  InstallmentRow,
   Person,
   Project,
   ProjectDetail,
@@ -67,6 +68,11 @@ export const api = {
       request<Activity>(`/api/activities/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
     toggle: (id: string) => request<Activity>(`/api/activities/${id}/toggle`, { method: 'POST' }),
     remove: (id: string) => request<void>(`/api/activities/${id}`, { method: 'DELETE' }),
+  },
+
+  installments: {
+    /** Todas as parcelas de todos os projetos. */
+    list: () => request<InstallmentRow[]>('/api/installments'),
   },
 
   projects: {

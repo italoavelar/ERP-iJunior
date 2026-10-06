@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { api, ApiError } from '../lib/api'
-import { BRL, fmtDate, parseAmount } from '../lib/format'
+import { BRL, fmtDate, parseAmount, today } from '../lib/format'
 import type { ProjectDetail } from '../lib/types'
 
 /** Soma em centavos para não acumular erro de ponto flutuante. */
@@ -40,7 +40,7 @@ export function ReplanejarForm({
     String(detail.installments.filter((i) => i.paid).length),
   )
   const [firstDueDate, setFirstDueDate] = useState(
-    detail.installments[0]?.dueDate ?? new Date().toISOString().slice(0, 10),
+    detail.installments[0]?.dueDate ?? today(),
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)

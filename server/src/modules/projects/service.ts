@@ -1,5 +1,5 @@
 import { prisma } from '../../lib/prisma.js'
-import { toISODate, toNumber, fromISODate } from '../../lib/serialize.js'
+import { toISODate, toNumber, fromISODate, localToday } from '../../lib/serialize.js'
 import { HttpError, notFound } from '../../lib/httpError.js'
 import { addMonths, split } from '../../lib/plan.js'
 
@@ -129,7 +129,7 @@ export async function updateInstallment(
   let paidAt: Date | null | undefined
   if (data.paid === false) paidAt = null
   else if (data.paidAt !== undefined) paidAt = data.paidAt ? fromISODate(data.paidAt) : null
-  else if (data.paid === true && !existing.paid) paidAt = fromISODate(new Date().toISOString().slice(0, 10))
+  else if (data.paid === true && !existing.paid) paidAt = fromISODate(localToday())
 
   await prisma.installment.update({
     where: key,
@@ -161,7 +161,7 @@ export async function setSprintValidated(
   const sprint = await prisma.sprint.findUnique({ where: key })
   if (!sprint) throw notFound('Sprint')
 
-  const when = fromISODate(date ?? new Date().toISOString().slice(0, 10))
+  const when = fromISODate(date ?? localToday())
 
   await prisma.$transaction(async (tx) => {
     if (validated) {
@@ -200,7 +200,7 @@ export async function replan(
 
   const previous = new Map(project.installments.map((i) => [i.number, i]))
   const amounts = split(input.total, input.count)
-  const today = fromISODate(new Date().toISOString().slice(0, 10))
+  const today = fromISODate(localToday())
 
   const rows = amounts.map((amount, idx) => {
     const number = idx + 1

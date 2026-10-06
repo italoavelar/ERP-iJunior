@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { IconCheckBox, IconMoon, IconProjects, IconSun } from './components/Icons'
+import { IconCalendar, IconCheckBox, IconMoon, IconProjects, IconSun } from './components/Icons'
 import { Toast } from './components/Toast'
 import { Atividades } from './screens/Atividades'
 import { Projetos } from './screens/Projetos'
+import { Parcelas } from './screens/Parcelas'
 import { ErrorState, Loading } from './components/primitives'
 import { api } from './lib/api'
 import { useAsync } from './hooks/useAsync'
@@ -11,16 +12,18 @@ import { useMediaQuery } from './hooks/useMediaQuery'
 import { useTheme } from './hooks/useTheme'
 import { useToast } from './hooks/useToast'
 
-type Screen = 'atividades' | 'projetos'
+type Screen = 'atividades' | 'projetos' | 'parcelas'
 
 const TITLES: Record<Screen, string> = {
   atividades: 'Atividades',
   projetos: 'Projetos',
+  parcelas: 'Parcelas',
 }
 
 const NAV: { key: Screen; label: string; icon: ReactNode }[] = [
   { key: 'atividades', label: 'Dashboard', icon: <IconCheckBox size={19} /> },
   { key: 'projetos', label: 'Projetos', icon: <IconProjects /> },
+  { key: 'parcelas', label: 'Parcelas', icon: <IconCalendar /> },
 ]
 
 export default function App() {
@@ -225,22 +228,22 @@ export default function App() {
         >
           {screen === 'atividades' && <Atividades desktop={desktop} onToast={show} />}
 
-          {screen !== 'atividades' &&
+          {screen === 'parcelas' && (
+            <Parcelas desktop={desktop} onUpdated={applyProject} onToast={show} />
+          )}
+
+          {screen === 'projetos' &&
             (projects.error ? (
               <ErrorState message={projects.error} onRetry={projects.reload} />
             ) : projects.loading ? (
               <Loading label="Carregando projetos…" />
             ) : (
-              <>
-                {screen === 'projetos' && (
-                  <Projetos
-                    desktop={desktop}
-                    projects={projects.data ?? []}
-                    onUpdated={applyProject}
-                    onToast={show}
-                  />
-                )}
-              </>
+              <Projetos
+                desktop={desktop}
+                projects={projects.data ?? []}
+                onUpdated={applyProject}
+                onToast={show}
+              />
             ))}
         </main>
       </div>

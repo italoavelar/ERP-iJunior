@@ -48,6 +48,7 @@ Base: `http://localhost:3333`
 | PATCH | `/api/activities/:id` | Edita título, detalhes ou responsáveis |
 | POST | `/api/activities/:id/toggle` | Alterna concluída/aberta |
 | DELETE | `/api/activities/:id` | Remove atividade |
+| GET | `/api/installments` | Todas as parcelas de todos os projetos (calendário e tabela) |
 | GET | `/api/projects?status=running\|finished` | Lista projetos |
 | GET | `/api/projects/:id` | Detalhe do projeto, com o plano de parcelas |
 | PATCH | `/api/projects/:id` | Edita nome, descrição, P.O., produto e situação |

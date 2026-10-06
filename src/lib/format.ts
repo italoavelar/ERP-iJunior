@@ -4,7 +4,13 @@ export const fmtDate = (iso: string | null) => {
   return `${d}/${m}/${y}`
 }
 
-export const today = () => new Date().toISOString().slice(0, 10)
+/** Hoje no fuso do navegador. toISOString() daria o dia em UTC, que no Brasil
+ *  vira o dia seguinte a partir das 21h. */
+export const today = () => {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
 
 export const BRL = (n: number) =>
   'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
