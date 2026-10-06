@@ -26,7 +26,8 @@ cd server
 cp .env.example .env
 npm install
 npm run db:migrate     # aplica as migrations
-npm run db:seed        # popula com os dados de demonstração
+npm run db:seed        # time e atividades de demonstração
+npm run db:import      # projetos, parcelas e sprints (ver "Dados de projetos")
 npm run dev
 
 # 3. front-end (porta 5173), em outro terminal
@@ -54,11 +55,31 @@ Base: `http://localhost:3333`
 | PATCH | `/api/projects/:id/installments/:number/nf` | Marca a NF de uma parcela específica |
 | PATCH | `/api/projects/:id/installments/:number` | Edita pagamento, NF ou valor da parcela |
 | PUT | `/api/projects/:id/installments` | Refaz o plano: preço, nº de parcelas, 1º vencimento e pagas |
+| PATCH | `/api/projects/:id/sprints/:number` | Valida uma sprint (`{ "validated": boolean }`) e libera a cobrança das parcelas ligadas a ela |
 
 O total contratado e o valor pago de um projeto são somados a partir das
 parcelas, não guardados em coluna — editar uma parcela recalcula os dois.
 
 Erros saem como `{ "error": "…" }`; falhas de validação incluem `issues` com o campo e a mensagem.
+
+## Dados de projetos
+
+Os projetos reais (clientes, contratos, parcelas) **não ficam no git** — o
+repositório é público. Eles vivem em `server/prisma/data/projetos.json`, que
+está no `.gitignore`, e entram no banco com:
+
+```bash
+cd server
+npm run db:import -- --prune   # --prune remove do banco o que não está no arquivo
+```
+
+Sem esse arquivo, o import usa `projetos.example.json`, com dados fictícios. A
+importação confere, antes de gravar, se as parcelas de cada projeto somam o
+total e o valor recebido esperados.
+
+Parcelas podem ficar sem vencimento quando dependem de um marco (NF, entrega,
+assinatura). Nos projetos pagos por sprint, a parcela aponta para a sprint que a
+libera: validar a sprint na tela de parcelas dá a ela o vencimento do dia.
 
 ## Scripts do servidor
 
@@ -69,7 +90,8 @@ Erros saem como `{ "error": "…" }`; falhas de validação incluem `issues` com
 | `npm run typecheck` | Checagem de tipos |
 | `npm run db:migrate` | Cria e aplica migration em desenvolvimento |
 | `npm run db:deploy` | Aplica migrations existentes (produção) |
-| `npm run db:seed` | Popula o banco (idempotente) |
+| `npm run db:seed` | Time e atividades de demonstração (idempotente) |
+| `npm run db:import` | Projetos, parcelas e sprints a partir de `prisma/data/` |
 | `npm run db:studio` | Abre o Prisma Studio |
 
 ## Front-end e API

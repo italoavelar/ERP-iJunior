@@ -14,9 +14,11 @@ const installmentParams = z.object({
 const updateBody = z
   .object({
     name: z.string().trim().min(1, 'O projeto precisa de um nome.'),
-    description: z.string().trim().min(1, 'Descreva o projeto.'),
-    po: z.string().trim().min(1, 'Informe o P.O. responsável.'),
-    product: z.enum(['LOOP', 'START']),
+    client: z.string().trim(),
+    description: z.string().trim(),
+    notes: z.string().trim(),
+    po: z.string().trim(),
+    product: z.enum(['LOOP', 'START']).nullable(),
     running: z.boolean(),
   })
   .partial()
@@ -24,11 +26,17 @@ const updateBody = z
 
 const nfBody = z.object({ issued: z.boolean() })
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida.')
+
 const installmentBody = z
   .object({
     paid: z.boolean(),
     nfIssued: z.boolean(),
     amount: z.number().positive('O valor da parcela precisa ser maior que zero.'),
+    dueDate: isoDate.nullable(),
+    paidAt: isoDate.nullable(),
+    description: z.string().trim(),
+    notes: z.string().trim(),
   })
   .partial()
   .refine((v) => Object.keys(v).length > 0, { message: 'Envie ao menos um campo.' })
@@ -87,7 +95,20 @@ projectsRouter.put('/:id/installments', async (req, res) => {
   res.json(await service.replan(id, input))
 })
 
-/** Pagamento, NF ou valor de uma parcela. */
+const sprintParams = z.object({
+  id: z.string().min(1),
+  number: z.coerce.number().int().positive(),
+})
+const sprintBody = z.object({ validated: z.boolean(), date: isoDate.optional() })
+
+/** Valida uma sprint (libera a cobrança das parcelas ligadas a ela) ou desfaz. */
+projectsRouter.patch('/:id/sprints/:number', async (req, res) => {
+  const { id, number } = sprintParams.parse(req.params)
+  const { validated, date } = sprintBody.parse(req.body)
+  res.json(await service.setSprintValidated(id, number, validated, date))
+})
+
+/** Pagamento, NF, valor, vencimento ou descrição de uma parcela. */
 projectsRouter.patch('/:id/installments/:number', async (req, res) => {
   const { id, number } = installmentParams.parse(req.params)
   const data = installmentBody.parse(req.body)

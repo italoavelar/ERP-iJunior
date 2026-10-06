@@ -1,4 +1,11 @@
-import type { Activity, Person, Project, ProjectDetail, ProjectInput } from './types'
+import type {
+  Activity,
+  InstallmentPatch,
+  Person,
+  Project,
+  ProjectDetail,
+  ProjectInput,
+} from './types'
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -90,14 +97,16 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(input),
       }),
-    updateInstallment: (
-      id: string,
-      number: number,
-      data: { paid?: boolean; nfIssued?: boolean; amount?: number },
-    ) =>
+    updateInstallment: (id: string, number: number, data: InstallmentPatch) =>
       request<ProjectDetail>(`/api/projects/${id}/installments/${number}`, {
         method: 'PATCH',
         body: JSON.stringify(data),
+      }),
+    /** Valida a sprint (libera a cobrança das parcelas ligadas) ou desfaz. */
+    setSprint: (id: string, number: number, validated: boolean, date?: string) =>
+      request<ProjectDetail>(`/api/projects/${id}/sprints/${number}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ validated, date }),
       }),
   },
 }

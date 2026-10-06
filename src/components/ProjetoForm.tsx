@@ -20,6 +20,8 @@ export function ProjetoForm({
 }) {
   const [draft, setDraft] = useState<ProjectInput>({
     name: project.name,
+    client: project.client,
+    notes: project.notes,
     description: project.description,
     po: project.po,
     product: project.product,
@@ -43,6 +45,8 @@ export function ProjetoForm({
       const updated = await api.projects.update(project.id, {
         ...draft,
         name: draft.name.trim(),
+        client: draft.client.trim(),
+        notes: draft.notes.trim(),
         description: draft.description.trim(),
         po: draft.po.trim(),
       })
@@ -70,7 +74,7 @@ export function ProjetoForm({
       onClose={onClose}
       desktop={desktop}
       title="Editar projeto"
-      subtitle="Nome, descrição, P.O., produto e situação."
+      subtitle="Dados cadastrais do projeto."
       footer={
         <>
           <button
@@ -106,6 +110,19 @@ export function ProjetoForm({
       </div>
 
       <div>
+        <label className="label" htmlFor="pj-client">
+          Contratante
+        </label>
+        <input
+          id="pj-client"
+          className="field"
+          value={draft.client}
+          onChange={(e) => set('client', e.target.value)}
+          placeholder="Quem contrata e paga"
+        />
+      </div>
+
+      <div>
         <label className="label" htmlFor="pj-desc">
           Descrição
         </label>
@@ -117,6 +134,19 @@ export function ProjetoForm({
           onChange={(e) => set('description', e.target.value)}
         />
         {errors.description && <span className="error-text">{errors.description}</span>}
+      </div>
+
+      <div>
+        <label className="label" htmlFor="pj-notes">
+          Observação financeira
+        </label>
+        <input
+          id="pj-notes"
+          className="field"
+          value={draft.notes}
+          onChange={(e) => set('notes', e.target.value)}
+          placeholder="Ex.: contrato sem assinatura"
+        />
       </div>
 
       <div>
@@ -139,10 +169,11 @@ export function ProjetoForm({
         <select
           id="pj-product"
           className="field"
-          value={draft.product}
-          onChange={(e) => set('product', e.target.value as Product)}
+          value={draft.product ?? ''}
+          onChange={(e) => set('product', (e.target.value || null) as Product | null)}
           style={{ cursor: 'pointer' }}
         >
+          <option value="">A definir</option>
           <option value="LOOP">LOOP</option>
           <option value="START">START</option>
         </select>

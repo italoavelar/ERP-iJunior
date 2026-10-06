@@ -13,10 +13,28 @@ export const BRL = (n: number) =>
 export const daysTo = (iso: string) =>
   Math.round((new Date(iso).getTime() - new Date(today()).getTime()) / 86400000)
 
-/** Situação da parcela a partir do pagamento e do vencimento. */
-export const installmentStatus = (paid: boolean, dueDate: string) => {
-  if (paid) return 'Paga' as const
-  return daysTo(dueDate) < 0 ? ('Vencida' as const) : ('A vencer' as const)
+export type InstallmentStatus = 'Paga' | 'Vencida' | 'A vencer' | 'Aguarda sprint' | 'Condicionada'
+
+/**
+ * Situação da parcela. Sem vencimento, ela depende de um marco: se o marco é
+ * uma sprint, "Aguarda sprint"; senão (NF, entrega, contrato), "Condicionada".
+ */
+export const installmentStatus = (i: {
+  paid: boolean
+  dueDate: string | null
+  sprintNumber: number | null
+}): InstallmentStatus => {
+  if (i.paid) return 'Paga'
+  if (!i.dueDate) return i.sprintNumber ? 'Aguarda sprint' : 'Condicionada'
+  return daysTo(i.dueDate) < 0 ? 'Vencida' : 'A vencer'
+}
+
+/** Texto e cor do vencimento a partir da distância em dias. */
+export const dueLabel = (iso: string) => {
+  const d = daysTo(iso)
+  if (d < 0) return { label: `vencido há ${Math.abs(d)} ${Math.abs(d) === 1 ? 'dia' : 'dias'}`, tone: 'var(--destructive)' }
+  if (d === 0) return { label: 'vence hoje', tone: 'var(--amber)' }
+  return { label: `em ${d} ${d === 1 ? 'dia' : 'dias'}`, tone: d <= 5 ? 'var(--amber)' : 'var(--mutedfg)' }
 }
 
 /** Lê um valor digitado em pt-BR ("1.234,56") ou com ponto decimal. */

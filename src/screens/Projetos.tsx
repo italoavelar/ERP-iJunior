@@ -10,6 +10,31 @@ import { BRL, fmtDate } from '../lib/format'
 
 type Tab = 'execucao' | 'finalizados'
 
+/** Próximo pagamento em texto, inclusive quando ele depende de um marco. */
+const nextPayment = (p: Project) => {
+  if (p.nextNumber === null) return 'contrato quitado'
+  if (p.nextDate) return `próximo pagamento em ${fmtDate(p.nextDate)}`
+  if (p.nextSprint) return `próximo pagamento após a Sprint ${p.nextSprint}`
+  return `próximo: ${p.nextDescription || 'parcela'} (data a definir)`
+}
+
+const ProductTag = ({ product }: { product: Project['product'] }) =>
+  product ? (
+    <span
+      className="chip"
+      style={{
+        flex: 'none',
+        borderRadius: 7,
+        fontWeight: 700,
+        letterSpacing: '.03em',
+        background: productTone(product)[0],
+        color: productTone(product)[1],
+      }}
+    >
+      {product}
+    </span>
+  ) : null
+
 export function Projetos({
   desktop,
   projects,
@@ -123,20 +148,13 @@ export function Projetos({
               <span style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>
                 {p.name}
               </span>
-              <span
-                className="chip"
-                style={{
-                  flex: 'none',
-                  borderRadius: 7,
-                  fontWeight: 700,
-                  letterSpacing: '.03em',
-                  background: productTone(p.product)[0],
-                  color: productTone(p.product)[1],
-                }}
-              >
-                {p.product}
-              </span>
+              <ProductTag product={p.product} />
             </div>
+            {p.client && (
+              <div className="truncate" style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 4 }}>
+                {p.client}
+              </div>
+            )}
             <div
               style={{
                 display: 'flex',
@@ -146,7 +164,10 @@ export function Projetos({
                 marginTop: 8,
               }}
             >
-              <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>P.O. {p.po}</span>
+              <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>
+                {p.po ? `P.O. ${p.po}` : 'P.O. a definir'}
+                {p.sprintCount > 0 && ` · Sprint ${p.lastValidatedSprint ?? 0}/${p.sprintCount}`}
+              </span>
               <span
                 role="button"
                 tabIndex={0}
@@ -265,18 +286,7 @@ function ProjectDetail({
             <h2 style={{ margin: 0, fontFamily: 'Sora, sans-serif', fontWeight: 800, fontSize: 22, lineHeight: 1.25 }}>
               {p.name}
             </h2>
-            <span
-              className="chip"
-              style={{
-                borderRadius: 7,
-                fontWeight: 700,
-                letterSpacing: '.03em',
-                background: productTone(p.product)[0],
-                color: productTone(p.product)[1],
-              }}
-            >
-              {p.product}
-            </span>
+            <ProductTag product={p.product} />
             <Chip
               tone={
                 p.running
@@ -287,8 +297,14 @@ function ProjectDetail({
               {p.running ? 'Em execução' : 'Finalizado'}
             </Chip>
           </div>
-          <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 8 }}>
-            P.O. (gerente): <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.po}</span>
+          {p.client && (
+            <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 8 }}>
+              Contratante: <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.client}</span>
+            </div>
+          )}
+          <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 4 }}>
+            P.O. (gerente):{' '}
+            <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.po || 'a definir'}</span>
           </div>
         </div>
         <button
@@ -313,10 +329,33 @@ function ProjectDetail({
         >
           Descrição
         </div>
-        <p style={{ margin: '8px 0 0', fontSize: 13.5, lineHeight: 1.6, textWrap: 'pretty' }}>
-          {p.description}
+        <p
+          style={{
+            margin: '8px 0 0',
+            fontSize: 13.5,
+            lineHeight: 1.6,
+            textWrap: 'pretty',
+            color: p.description ? undefined : 'var(--mutedfg)',
+          }}
+        >
+          {p.description || 'Sem descrição — use “Editar projeto” para preencher.'}
         </p>
       </div>
+
+      {p.notes && (
+        <div
+          style={{
+            fontSize: 13,
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: 'color-mix(in oklch,var(--amber) 10%,transparent)',
+            border: '1px solid color-mix(in oklch,var(--amber) 30%,transparent)',
+            lineHeight: 1.5,
+          }}
+        >
+          {p.notes}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
         {box('Preço total', BRL(p.total))}
@@ -335,9 +374,7 @@ function ProjectDetail({
           }}
         >
           <span>{pctOf(p)} pago</span>
-          <span>
-            {p.nextDate ? `próximo pagamento em ${fmtDate(p.nextDate)}` : 'contrato quitado'}
-          </span>
+          <span>{nextPayment(p)}</span>
         </div>
         <div style={{ marginTop: 9 }}>
           <ProgressBar pct={pctOf(p)} />
@@ -358,7 +395,13 @@ function ProjectDetail({
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 600 }}>NF do próximo pagamento</div>
           <div style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 3 }}>
-            {p.nextDate ? `Vencimento em ${fmtDate(p.nextDate)}` : 'Sem pagamentos pendentes'}
+            {p.nextNumber === null
+              ? 'Sem pagamentos pendentes'
+              : p.nextDate
+                ? `Vencimento em ${fmtDate(p.nextDate)}`
+                : p.nextSprint
+                  ? `Libera após a validação da Sprint ${p.nextSprint}`
+                  : `${p.nextDescription || 'Parcela'} · vencimento a definir`}
           </div>
         </div>
         <span
@@ -371,7 +414,7 @@ function ProjectDetail({
 
       <div style={{ display: 'flex', gap: 10 }}>
         <button className="btn-ghost" onClick={onParcelas} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
-          Ver parcelas ({p.nfCount}/{p.installmentCount} NFs)
+          {p.sprintCount > 0 ? 'Parcelas e sprints' : 'Ver parcelas'} ({p.paidCount}/{p.installmentCount} pagas)
         </button>
         <button className="btn-primary" onClick={onEdit} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
           <IconEdit />
