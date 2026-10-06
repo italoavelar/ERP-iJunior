@@ -41,6 +41,8 @@ export default function App() {
   const applyProject = (updated: Project) =>
     projects.set((cur) => cur.map((p) => (p.id === updated.id ? updated : p)))
 
+  const removeProject = (id: string) => projects.set((cur) => cur.filter((p) => p.id !== id))
+
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--fg)', display: 'flex' }}>
@@ -242,6 +244,7 @@ export default function App() {
                 desktop={desktop}
                 projects={projects.data ?? []}
                 onUpdated={applyProject}
+                onRemoved={removeProject}
                 onToast={show}
               />
             ))}

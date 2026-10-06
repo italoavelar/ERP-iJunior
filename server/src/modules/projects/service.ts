@@ -101,6 +101,11 @@ export async function updateProject(
   return serializeDetail(row)
 }
 
+/** Apaga o projeto. Parcelas e sprints vão junto (onDelete: Cascade no schema). */
+export async function deleteProject(id: string) {
+  await prisma.project.delete({ where: { id } })
+}
+
 /**
  * Edita uma parcela. Marcar como paga registra a data (hoje, se não vier) e
  * desmarcar limpa data e valor recebido — senão o pago ficaria inconsistente.

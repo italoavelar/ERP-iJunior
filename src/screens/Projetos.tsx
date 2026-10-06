@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Chip, EmptyState, ProgressBar } from '../components/primitives'
-import { Sheet } from '../components/Overlay'
+import { ConfirmDialog, Sheet } from '../components/Overlay'
 import { ProjetoForm } from '../components/ProjetoForm'
 import { ParcelasSheet } from '../components/ParcelasSheet'
-import { IconClose, IconEdit } from '../components/Icons'
+import { IconClose, IconEdit, IconTrash } from '../components/Icons'
 import { pctOf, productTone } from '../lib/tone'
+import { api } from '../lib/api'
 import type { Project } from '../lib/types'
 import { BRL, dueLabel, fmtDate } from '../lib/format'
 
@@ -91,17 +92,21 @@ export function Projetos({
   desktop,
   projects,
   onUpdated,
+  onRemoved,
   onToast,
 }: {
   desktop: boolean
   projects: Project[]
   onUpdated: (p: Project) => void
+  onRemoved: (id: string) => void
   onToast: (title: string, body: string, tone?: string) => void
 }) {
   const [tab, setTab] = useState<Tab>('pendentes')
   const [openId, setOpenId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [parcelasId, setParcelasId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const pending = projects.filter(isPending).sort((a, b) => urgency(a).localeCompare(urgency(b)))
   const settled = projects.filter((p) => !isPending(p)).sort((a, b) => a.name.localeCompare(b.name))
@@ -110,6 +115,23 @@ export function Projetos({
   const owed = pending.reduce((acc, p) => acc + Math.round((p.total - p.paid) * 100), 0) / 100
   const open = projects.find((p) => p.id === openId) ?? null
   const editing = projects.find((p) => p.id === editId) ?? null
+  const toDelete = projects.find((p) => p.id === deleteId) ?? null
+
+  const confirmDelete = async () => {
+    if (!toDelete || deleting) return
+    setDeleting(true)
+    try {
+      await api.projects.remove(toDelete.id)
+      onRemoved(toDelete.id)
+      setOpenId(null)
+      onToast('Projeto excluído', `${toDelete.name} e suas parcelas foram apagados.`, 'var(--destructive)')
+    } catch (e) {
+      onToast('Não deu para excluir', e instanceof Error ? e.message : String(e), 'var(--destructive)')
+    } finally {
+      setDeleting(false)
+      setDeleteId(null)
+    }
+  }
 
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: 'pendentes', label: 'Pagamentos pendentes', count: pending.length },
@@ -308,8 +330,43 @@ export function Projetos({
             setOpenId(null)
           }}
           onParcelas={() => setParcelasId(open.id)}
+          onDelete={() => setDeleteId(open.id)}
         />
       )}
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onClose={() => setDeleteId(null)}
+        title={`Excluir ${toDelete?.name ?? 'projeto'}?`}
+        confirmLabel={deleting ? 'Excluindo…' : 'Excluir projeto'}
+        onConfirm={() => void confirmDelete()}
+      >
+        {toDelete && (
+          <>
+            <p style={{ margin: '12px 0 0', fontSize: 13.5, lineHeight: 1.55, color: 'var(--mutedfg)' }}>
+              Apaga o projeto junto com as {toDelete.installmentCount}{' '}
+              {toDelete.installmentCount === 1 ? 'parcela' : 'parcelas'}
+              {toDelete.sprintCount > 0 && ` e as ${toDelete.sprintCount} sprints`}. Esta ação não pode ser
+              desfeita.
+            </p>
+            {toDelete.paid > 0 && (
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  background: 'color-mix(in oklch,var(--destructive) 10%,transparent)',
+                  color: 'var(--destructive)',
+                }}
+              >
+                O registro de {BRL(toDelete.paid)} já recebidos ({toDelete.paidCount}{' '}
+                {toDelete.paidCount === 1 ? 'parcela paga' : 'parcelas pagas'}) também será apagado.
+              </div>
+            )}
+          </>
+        )}
+      </ConfirmDialog>
 
       {editing && (
         <ProjetoForm
@@ -340,12 +397,14 @@ function ProjectDetail({
   onClose,
   onEdit,
   onParcelas,
+  onDelete,
 }: {
   project: Project
   desktop: boolean
   onClose: () => void
   onEdit: () => void
   onParcelas: () => void
+  onDelete: () => void
 }) {
   const box = (label: string, value: string, accent?: boolean) => (
     <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
@@ -478,6 +537,26 @@ function ProjectDetail({
           Editar projeto
         </button>
       </div>
+
+      <button
+        onClick={onDelete}
+        style={{
+          alignSelf: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          border: 0,
+          background: 'transparent',
+          color: 'var(--destructive)',
+          fontSize: 13,
+          fontWeight: 600,
+          cursor: 'pointer',
+          padding: '4px 8px',
+        }}
+      >
+        <IconTrash size={15} />
+        Excluir projeto
+      </button>
     </Sheet>
   )
 }

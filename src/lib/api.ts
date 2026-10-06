@@ -78,6 +78,8 @@ export const api = {
   projects: {
     list: () => request<Project[]>('/api/projects'),
     get: (id: string) => request<ProjectDetail>(`/api/projects/${id}`),
+    /** Apaga o projeto com todas as parcelas e sprints. */
+    remove: (id: string) => request<void>(`/api/projects/${id}`, { method: 'DELETE' }),
     update: (id: string, input: Partial<ProjectInput>) =>
       request<ProjectDetail>(`/api/projects/${id}`, {
         method: 'PATCH',

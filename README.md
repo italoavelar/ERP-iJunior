@@ -52,6 +52,7 @@ Base: `http://localhost:3333`
 | GET | `/api/projects?status=running\|finished` | Lista projetos |
 | GET | `/api/projects/:id` | Detalhe do projeto, com o plano de parcelas |
 | PATCH | `/api/projects/:id` | Edita nome, descrição, P.O., produto e situação |
+| DELETE | `/api/projects/:id` | Exclui o projeto com suas parcelas e sprints |
 | PATCH | `/api/projects/:id/installments/:number` | Edita pagamento, data de pagamento, vencimento ou valor da parcela |
 | PUT | `/api/projects/:id/installments` | Refaz o plano: preço, nº de parcelas, 1º vencimento e pagas |
 | PATCH | `/api/projects/:id/sprints/:number` | Valida uma sprint (`{ "validated": boolean }`) e libera a cobrança das parcelas ligadas a ela |

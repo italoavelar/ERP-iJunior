@@ -74,6 +74,12 @@ const replanBody = z
     message: 'Não dá para ter mais parcelas pagas do que parcelas.',
   })
 
+projectsRouter.delete('/:id', async (req, res) => {
+  const { id } = idParam.parse(req.params)
+  await service.deleteProject(id)
+  res.status(204).end()
+})
+
 /** Refaz o plano: preço, número de parcelas, primeiro vencimento e pagas. */
 projectsRouter.put('/:id/installments', async (req, res) => {
   const { id } = idParam.parse(req.params)
