@@ -1,0 +1,837 @@
+{
+  "source": "Controle_Recebimentos_Projetos_iJunior (Google Sheets), data-base 03/10/2026 + pagamento do Bicco's em 05/10/2026",
+  "projects": [
+    {
+      "id": "csi",
+      "name": "CSI",
+      "client": "CSI Caldeiraria e Serralheria Industrial",
+      "product": null,
+      "po": "",
+      "notes": "Contrato sem versão assinada",
+      "running": true,
+      "check": {
+        "total": 2700,
+        "received": 0
+      },
+      "installments": [
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "1ª vence 3 dias úteis após a NF (ainda não emitida); demais a cada 30 dias"
+        },
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 450,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "multjr",
+      "name": "Mult Jr",
+      "client": "Mult Jr Consultoria e Projetos",
+      "product": null,
+      "po": "",
+      "notes": "1ª parcela sem registro de pagamento; confirmar emissão do boleto",
+      "running": true,
+      "check": {
+        "total": 3500,
+        "received": 0
+      },
+      "installments": [
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2026-09-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": "Datas estimadas: boleto considerado emitido na assinatura (09/09/2026) + 3 dias úteis. Ajustar com a data real do boleto"
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2026-10-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2026-11-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2026-12-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2027-01-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2027-02-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2027-03-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 437.5,
+          "dueDate": "2027-04-14",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "farmavax",
+      "name": "FarmaVax",
+      "client": "FUNDEP",
+      "product": null,
+      "po": "",
+      "notes": "Contrato sem assinatura",
+      "running": true,
+      "check": {
+        "total": 3800,
+        "received": 0
+      },
+      "installments": [
+        {
+          "description": "Parcela 1",
+          "amount": 2800,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "3 dias úteis após a NF"
+        },
+        {
+          "description": "Parcela 2",
+          "amount": 1000,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à entrega do painel administrador"
+        }
+      ]
+    },
+    {
+      "id": "reitoria",
+      "name": "Reitoria / Sempre UFMG",
+      "client": "FUNDEP",
+      "product": null,
+      "po": "Mariana Bastos",
+      "notes": "1ª parcela após a Sprint 4",
+      "running": true,
+      "check": {
+        "total": 67020,
+        "received": 0
+      },
+      "sprints": {
+        "count": 14,
+        "validated": []
+      },
+      "installments": [
+        {
+          "description": "Após Sprint 4",
+          "amount": 16755,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 4
+        },
+        {
+          "description": "Após Sprint 8",
+          "amount": 16755,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 8
+        },
+        {
+          "description": "Após Sprint 11",
+          "amount": 16755,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 11
+        },
+        {
+          "description": "Após Sprint 14",
+          "amount": 16755,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 14
+        }
+      ]
+    },
+    {
+      "id": "junia",
+      "name": "Júnia",
+      "client": "Júnia Pereira Teixeira",
+      "product": "LOOP",
+      "po": "Guilherme Alves",
+      "notes": "Módulo 1 por hora; saldo só se houver horas a faturar",
+      "running": true,
+      "check": {
+        "total": 25430,
+        "received": 21596.5
+      },
+      "installments": [
+        {
+          "description": "Módulo 1 – horas (sprint)",
+          "amount": 3885.5,
+          "dueDate": "2024-06-21",
+          "paid": true,
+          "paidAt": "2024-06-21",
+          "notes": "NF 2024/12"
+        },
+        {
+          "description": "Módulo 1 – horas (sprint)",
+          "amount": 3855.5,
+          "dueDate": "2024-07-17",
+          "paid": true,
+          "paidAt": "2024-07-17",
+          "notes": "NF 2024/12"
+        },
+        {
+          "description": "Módulo 1 – horas (sprint)",
+          "amount": 3855.5,
+          "dueDate": "2024-09-06",
+          "paid": true,
+          "paidAt": "2024-09-06",
+          "notes": "NF 2024/12"
+        },
+        {
+          "description": "Módulo 2 – à vista",
+          "amount": 10008,
+          "dueDate": "2025-09-30",
+          "paid": true,
+          "paidAt": "2025-10-07",
+          "notes": "Pago R$ 8,00 a menos e 7 dias após o vencimento. NF não registrada no Nibo",
+          "paidAmount": 10000
+        },
+        {
+          "description": "Módulo 1 – saldo até o teto",
+          "amount": 3825.5,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Teto do Módulo 1 = R$ 15.422,00 (por hora). Só é devido se houver horas a faturar"
+        }
+      ]
+    },
+    {
+      "id": "swithaus",
+      "name": "Swithaus",
+      "client": "R P S Zebral Soluções",
+      "product": "LOOP",
+      "po": "Henrique Góes",
+      "notes": "2ª metade devida na entrega",
+      "running": true,
+      "check": {
+        "total": 25992.12,
+        "received": 12996.06
+      },
+      "installments": [
+        {
+          "description": "50% – fim da Sprint 5",
+          "amount": 12996.06,
+          "dueDate": null,
+          "paid": true,
+          "paidAt": "2024-11-06",
+          "notes": "NF 2024/31. Previsto = 50% das horas apuradas"
+        },
+        {
+          "description": "50% – na entrega",
+          "amount": 12996.06,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Teto contratual R$ 26.796,00"
+        }
+      ]
+    },
+    {
+      "id": "itracker",
+      "name": "iTracker SaaS",
+      "client": "Pi Júnior",
+      "product": null,
+      "po": "",
+      "notes": "Contrato em minuta; 1ª parcela em 10/10/2026",
+      "running": true,
+      "check": {
+        "total": 500,
+        "received": 0
+      },
+      "installments": [
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2026-10-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2026-11-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2026-12-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-01-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-02-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-03-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-04-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-05-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-06-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 50,
+          "dueDate": "2027-07-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "lexium",
+      "name": "Lexium / LexUp",
+      "client": "Fabiane C. T. dos Santos e Maria Carolina S. B. Souza",
+      "product": null,
+      "po": "",
+      "running": true,
+      "check": {
+        "total": 12000,
+        "received": 4000
+      },
+      "notes": "Contrato no Drive é minuta sem assinatura (cita o Helper e tem datas anteriores ao início do projeto)",
+      "installments": [
+        {
+          "description": "Entrada",
+          "amount": 4000,
+          "dueDate": "2026-07-07",
+          "paid": true,
+          "paidAt": "2026-09-15",
+          "notes": "Pix de Maria Carolina, ainda não conciliado no Nibo. Trocar a categoria sugerida (\"Receita com Doações\") para \"Receita com Serviços\" antes de conciliar. Vencimento original estimado (5 dias após a NF)"
+        },
+        {
+          "description": "Parcela",
+          "amount": 4000,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Vencimento a confirmar"
+        },
+        {
+          "description": "Parcela",
+          "amount": 4000,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Vencimento a confirmar"
+        }
+      ]
+    },
+    {
+      "id": "robolotto",
+      "name": "Robolotto",
+      "client": "Tomás Prado de Moraes",
+      "product": "LOOP",
+      "po": "Marina Cruz",
+      "notes": "Paga por sprint: entrada e depois após a validação das Sprints 4, 6 e 8",
+      "running": true,
+      "check": {
+        "total": 5550,
+        "received": 2775
+      },
+      "sprints": {
+        "count": 8,
+        "validated": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "installments": [
+        {
+          "description": "Entrada",
+          "amount": 1387.5,
+          "dueDate": "2026-07-04",
+          "paid": true,
+          "paidAt": "2026-07-04",
+          "notes": "NF 11"
+        },
+        {
+          "description": "Após Sprint 4",
+          "amount": 1387.5,
+          "dueDate": null,
+          "paid": true,
+          "paidAt": "2026-09-18",
+          "notes": "Pix, ainda não conciliado no Nibo",
+          "sprintNumber": 4
+        },
+        {
+          "description": "Após Sprint 6",
+          "amount": 1387.5,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 6
+        },
+        {
+          "description": "Após Sprint 8",
+          "amount": 1387.5,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "notes": "Condicionada à validação da sprint",
+          "sprintNumber": 8
+        }
+      ]
+    },
+    {
+      "id": "climel",
+      "name": "Climel",
+      "client": "Climel Clínica de Olhos Ltda",
+      "product": "LOOP",
+      "po": "Arthur Maciel",
+      "notes": "Quitado",
+      "running": false,
+      "check": {
+        "total": 2100,
+        "received": 2100
+      },
+      "installments": [
+        {
+          "description": "À vista",
+          "amount": 2100,
+          "dueDate": "2026-06-29",
+          "paid": true,
+          "paidAt": "2026-06-29",
+          "notes": "NF 6"
+        }
+      ]
+    },
+    {
+      "id": "biccos",
+      "name": "Bicco's",
+      "client": "Bicco's Snacks Ltda",
+      "product": null,
+      "po": "",
+      "notes": "Contrato sem assinatura",
+      "running": true,
+      "check": {
+        "total": 3950,
+        "received": 3950
+      },
+      "installments": [
+        {
+          "description": "À vista",
+          "amount": 3950,
+          "dueDate": null,
+          "paid": true,
+          "paidAt": "2026-10-05",
+          "notes": "Vence 5 dias após a NF. Pagamento de R$ 3.950,00 em 05/10/2026, informado pelo financeiro (ainda não está na planilha nem no Nibo)"
+        }
+      ]
+    },
+    {
+      "id": "helper",
+      "name": "Helper",
+      "client": "Marcial Godoi (pagador no Nibo: Pedra Um Ltda)",
+      "product": null,
+      "po": "Paulo Menezes",
+      "running": true,
+      "check": {
+        "total": 23500,
+        "received": 1000
+      },
+      "notes": "Valores da parte iJunior (R$ 1.250/parcela; contrato total R$ 45.000, 50% Pi Júnior). R$ 1.000 do contrato antigo a conciliar",
+      "installments": [
+        {
+          "description": "Contrato antigo (rescindido) – 1/5",
+          "amount": 1000,
+          "dueDate": "2026-07-10",
+          "paid": true,
+          "paidAt": "2026-07-10",
+          "notes": "NF 10. Definir se este valor foi abatido do contrato novo"
+        },
+        {
+          "description": "1/18 – Entrada (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2026-08-26",
+          "paid": false,
+          "paidAt": null,
+          "notes": "Vencimento estimado (5 dias após a NF)"
+        },
+        {
+          "description": "2/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2026-09-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "3/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2026-10-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "4/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2026-11-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "5/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2026-12-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "6/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-01-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "7/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-02-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "8/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-03-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "9/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-04-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "10/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-05-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "11/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-06-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "12/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-07-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "13/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-08-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "14/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-09-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "15/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-10-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "16/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-11-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "17/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2027-12-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "18/18 – Parcela (parte iJunior)",
+          "amount": 1250,
+          "dueDate": "2028-01-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "dealernext",
+      "name": "Dealer Next",
+      "client": "Victor Alexandre Mendes Barros",
+      "product": "LOOP",
+      "po": "",
+      "notes": "O repasse de R$ 1.500 à LEX (contas a pagar) não está aqui",
+      "running": true,
+      "check": {
+        "total": 15800,
+        "received": 9000
+      },
+      "installments": [
+        {
+          "description": "Entrada",
+          "amount": 1000,
+          "dueDate": "2026-05-05",
+          "paid": true,
+          "paidAt": "2026-05-04",
+          "notes": "NF 4"
+        },
+        {
+          "description": "Entrada",
+          "amount": 1000,
+          "dueDate": "2026-06-05",
+          "paid": true,
+          "paidAt": "2026-06-09",
+          "notes": "NF 5"
+        },
+        {
+          "description": "Entrada",
+          "amount": 5000,
+          "dueDate": "2026-07-05",
+          "paid": true,
+          "paidAt": "2026-07-03",
+          "notes": "Pix. Repasse de R$ 1.500 à LEX passou a ser devido"
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-08-05",
+          "paid": true,
+          "paidAt": "2026-08-10",
+          "notes": "Pix (5 dias após o vencimento), ainda não conciliado no Nibo"
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-09-05",
+          "paid": true,
+          "paidAt": "2026-09-08",
+          "notes": "Pix (3 dias após o vencimento), ainda não conciliado no Nibo"
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-10-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-11-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-12-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2027-01-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2027-02-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2027-03-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela final",
+          "amount": 800,
+          "dueDate": "2027-04-05",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
+      ]
+    }
+  ]
+}

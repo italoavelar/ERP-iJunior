@@ -64,16 +64,18 @@ Erros saem como `{ "error": "…" }`; falhas de validação incluem `issues` com
 
 ## Dados de projetos
 
-Os projetos reais (clientes, contratos, parcelas) **não ficam no git** — o
-repositório é público. Eles vivem em `server/prisma/data/projetos.json`, que
-está no `.gitignore`, e entram no banco com:
+Os projetos reais (clientes, contratos, parcelas) ficam em
+`server/prisma/data/projetos.json`. **O arquivo tem dados de clientes: o
+repositório deve ser privado.** Eles entram no banco com:
 
 ```bash
 cd server
 npm run db:import -- --prune   # --prune remove do banco o que não está no arquivo
 ```
 
-Sem esse arquivo, o import usa `projetos.example.json`, com dados fictícios. A
+Sem esse arquivo, o import usa `projetos.example.json`, com dados fictícios.
+O arquivo serve para a carga inicial: depois dela, o banco é a fonte da verdade,
+e rodar o import de novo sobrescreve o que foi editado ou excluído pela tela. A
 importação confere, antes de gravar, se as parcelas de cada projeto somam o
 total e o valor recebido esperados.
 

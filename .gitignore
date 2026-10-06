@@ -5,7 +5,3 @@ dist
 *.local
 .DS_Store
 *.tsbuildinfo
-
-# Dados reais de clientes e contratos — o repositório é público
-server/prisma/data/*
-!server/prisma/data/projetos.example.json
