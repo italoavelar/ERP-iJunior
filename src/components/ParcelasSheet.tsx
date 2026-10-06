@@ -4,12 +4,12 @@ import { ReplanejarForm } from './ReplanejarForm'
 import { ErrorState, Loading, ProgressBar } from './primitives'
 import { api } from '../lib/api'
 import { BRL, fmtDate, installmentStatus, parseAmount, today } from '../lib/format'
-import { nfTone, statusTone } from '../lib/tone'
+import { statusTone } from '../lib/tone'
 import type { Installment, InstallmentPatch, Project, ProjectDetail } from '../lib/types'
 
 /**
- * Plano de parcelas de um projeto. Valor pago, quantidade de NFs e o que falta
- * são derivados daqui; nos projetos pagos por sprint, é aqui também que se
+ * Plano de parcelas de um projeto. Valor pago e o que falta são derivados
+ * daqui; nos projetos pagos por sprint, é aqui também que se
  * valida a sprint para liberar a cobrança.
  */
 export function ParcelasSheet({
@@ -128,7 +128,6 @@ export function ParcelasSheet({
     }
   }
 
-  const nfPct = detail ? Math.round((detail.nfCount / Math.max(1, detail.installmentCount)) * 100) : 0
   const askedSprint = detail?.sprints.find((s) => s.number === sprintAsk) ?? null
   const askedInstallments = detail?.installments.filter((i) => i.sprintNumber === sprintAsk && !i.paid) ?? []
 
@@ -181,7 +180,7 @@ export function ParcelasSheet({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10 }}>
             <Box label="Valor pago" value={BRL(detail.paid)} accent />
             <Box label="Falta" value={BRL(detail.total - detail.paid)} />
-            <Box label="NFs emitidas" value={`${detail.nfCount} de ${detail.installmentCount}`} />
+            <Box label="Parcelas pagas" value={`${detail.paidCount} de ${detail.installmentCount}`} />
           </div>
 
           <div>
@@ -197,9 +196,7 @@ export function ParcelasSheet({
                 marginBottom: 8,
               }}
             >
-              <span>
-                {detail.paidCount} de {detail.installmentCount} parcelas pagas · {nfPct}% das NFs emitidas
-              </span>
+              <span>{Math.round((detail.paid / Math.max(0.01, detail.total)) * 100)}% pago</span>
               <span className="num">{BRL(detail.total)} no contrato</span>
             </div>
             <ProgressBar pct={`${Math.round((detail.paid / Math.max(0.01, detail.total)) * 100)}%`} />
@@ -211,15 +208,14 @@ export function ParcelasSheet({
 
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className="scroll-x">
-              <table className="data" style={{ minWidth: 720 }}>
+              <table className="data" style={{ minWidth: 640 }}>
                 <thead>
                   <tr>
                     <th style={{ paddingLeft: 16 }}>Nº</th>
                     <th>Parcela</th>
                     <th>Vencimento</th>
                     <th style={{ textAlign: 'right' }}>Valor</th>
-                    <th>Situação</th>
-                    <th style={{ paddingRight: 16 }}>NF</th>
+                    <th style={{ paddingRight: 16 }}>Situação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -302,7 +298,7 @@ export function ParcelasSheet({
                             </div>
                           )}
                         </td>
-                        <td style={{ paddingTop: 11 }}>
+                        <td style={{ paddingTop: 11, paddingRight: 16 }}>
                           <ToggleChip
                             tone={statusTone(status)}
                             disabled={disabled}
@@ -336,21 +332,6 @@ export function ParcelasSheet({
                             </div>
                           )}
                         </td>
-                        <td style={{ paddingRight: 16, paddingTop: 11 }}>
-                          <ToggleChip
-                            tone={nfTone(i.nfIssued)}
-                            disabled={disabled}
-                            title={i.nfIssued ? 'Desmarcar NF' : 'Marcar NF como emitida'}
-                            onClick={() =>
-                              void apply(i.number, { nfIssued: !i.nfIssued }, [
-                                i.nfIssued ? 'NF desmarcada' : 'NF marcada como emitida',
-                                `Parcela ${i.number} de ${detail.name}`,
-                              ])
-                            }
-                          >
-                            {i.nfIssued ? 'Emitida' : 'Sem NF'}
-                          </ToggleChip>
-                        </td>
                       </tr>
                     )
                   })}
@@ -360,8 +341,9 @@ export function ParcelasSheet({
           </div>
 
           <p style={{ margin: 0, fontSize: 12.5, color: 'var(--mutedfg)', lineHeight: 1.5 }}>
-            Clique no vencimento, no valor ou na data de pagamento para editar, e nas etiquetas para alternar
-            pagamento e NF. Parcelas sem vencimento dependem de um marco — defina a data quando ele ocorrer.
+            Clique no vencimento, no valor ou na data de pagamento para editar, e na situação para marcar a
+            parcela como paga ou não paga. Parcelas sem vencimento dependem de um marco — defina a data quando
+            ele ocorrer.
           </p>
 
           <button className="btn-ghost" onClick={() => setReplanning(true)} style={{ height: 42, fontSize: 13.5 }}>

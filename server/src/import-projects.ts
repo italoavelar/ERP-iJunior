@@ -24,7 +24,6 @@ const installmentSchema = z.object({
   paid: z.boolean(),
   paidAt: isoDate.nullable(),
   paidAmount: z.number().positive().optional(),
-  nfIssued: z.boolean(),
   sprintNumber: z.number().int().positive().optional(),
   notes: z.string().default(''),
 })
@@ -111,7 +110,6 @@ async function main() {
             paid: i.paid,
             paidAt: i.paidAt ? fromISODate(i.paidAt) : null,
             paidAmount: i.paidAmount ?? null,
-            nfIssued: i.nfIssued,
             sprintNumber: i.sprintNumber ?? null,
             notes: i.notes,
           })),

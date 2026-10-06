@@ -24,7 +24,6 @@ const serializeInstallment = (i: InstallmentRow) => ({
   paid: i.paid,
   paidAt: toISODate(i.paidAt),
   paidAmount: i.paidAmount === null ? null : toNumber(i.paidAmount),
-  nfIssued: i.nfIssued,
   sprintNumber: i.sprintNumber,
   notes: i.notes,
 })
@@ -54,9 +53,6 @@ function summarize(p: ProjectRow) {
     nextDate: next ? toISODate(next.dueDate) : null,
     nextDescription: next?.description ?? null,
     nextSprint: next?.sprintNumber ?? null,
-    /** NF do próximo pagamento; num contrato quitado, se todas foram emitidas. */
-    nf: next ? next.nfIssued : p.installments.every((i) => i.nfIssued),
-    nfCount: p.installments.filter((i) => i.nfIssued).length,
     installmentCount: p.installments.length,
     paidCount: p.installments.filter((i) => i.paid).length,
     sprintCount: p.sprints.length,
@@ -114,7 +110,6 @@ export async function updateInstallment(
   number: number,
   data: {
     paid?: boolean
-    nfIssued?: boolean
     amount?: number
     dueDate?: string | null
     paidAt?: string | null
@@ -140,7 +135,6 @@ export async function updateInstallment(
     where: key,
     data: {
       paid: data.paid,
-      nfIssued: data.nfIssued,
       amount: data.amount,
       description: data.description,
       notes: data.notes,
@@ -150,19 +144,6 @@ export async function updateInstallment(
     },
   })
   return getProject(projectId)
-}
-
-export const setInstallmentNF = (projectId: string, number: number, issued: boolean) =>
-  updateInstallment(projectId, number, { nfIssued: issued })
-
-/** Atalho da tabela: age sobre a NF da primeira parcela em aberto. */
-export async function setNextNF(projectId: string, issued: boolean) {
-  const next = await prisma.installment.findFirst({
-    where: { projectId, paid: false },
-    orderBy: { number: 'asc' },
-  })
-  if (!next) throw notFound('Parcela em aberto')
-  return setInstallmentNF(projectId, next.number, issued)
 }
 
 /**
@@ -204,7 +185,7 @@ export async function setSprintValidated(
 
 /**
  * Refaz o plano: preço, número de parcelas, primeiro vencimento e quantas já
- * foram pagas. Descrição, observações, NF e vínculo com sprint de uma parcela
+ * foram pagas. Descrição, observações e vínculo com sprint de uma parcela
  * são preservados quando o número dela sobrevive ao novo plano.
  */
 export async function replan(
@@ -233,7 +214,6 @@ export async function replan(
       amount,
       paid,
       paidAt: paid ? (old?.paid && old.paidAt ? old.paidAt : today) : null,
-      nfIssued: old?.nfIssued ?? false,
       sprintNumber: old?.sprintNumber ?? null,
       notes: old?.notes ?? '',
     }

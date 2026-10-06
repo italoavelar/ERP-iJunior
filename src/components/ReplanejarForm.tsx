@@ -182,8 +182,8 @@ export function ReplanejarForm({
       )}
 
       <p style={{ margin: 0, fontSize: 12.5, color: 'var(--mutedfg)', lineHeight: 1.5 }}>
-        O plano é refeito por inteiro. As NFs já marcadas são preservadas nas parcelas de mesmo
-        número; parcelas novas nascem sem NF.
+        O plano é refeito por inteiro. Descrição, observações e vínculo com sprint são preservados nas
+        parcelas de mesmo número.
       </p>
 
       <div style={{ display: 'flex', gap: 10 }}>

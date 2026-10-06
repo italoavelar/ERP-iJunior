@@ -1,18 +1,27 @@
 import { useState } from 'react'
-import { Chip, ProgressBar } from '../components/primitives'
+import { Chip, EmptyState, ProgressBar } from '../components/primitives'
 import { Sheet } from '../components/Overlay'
 import { ProjetoForm } from '../components/ProjetoForm'
 import { ParcelasSheet } from '../components/ParcelasSheet'
 import { IconClose, IconEdit } from '../components/Icons'
-import { nfTone, pctOf, productTone } from '../lib/tone'
+import { pctOf, productTone } from '../lib/tone'
 import type { Project } from '../lib/types'
-import { BRL, fmtDate } from '../lib/format'
+import { BRL, dueLabel, fmtDate } from '../lib/format'
 
-type Tab = 'execucao' | 'finalizados'
+type Tab = 'pendentes' | 'finalizados'
+
+/** Ainda há parcela em aberto. */
+const isPending = (p: Project) => p.nextNumber !== null
+
+/** Ordem de cobrança: com data primeiro (as vencidas no topo), depois as que
+ *  dependem de marco. */
+const urgency = (p: Project) => (p.nextDate ? `1${p.nextDate}` : `2${p.name}`)
+
+const isOverdue = (p: Project) => !!p.nextDate && dueLabel(p.nextDate).tone === 'var(--destructive)'
 
 /** Próximo pagamento em texto, inclusive quando ele depende de um marco. */
 const nextPayment = (p: Project) => {
-  if (p.nextNumber === null) return 'contrato quitado'
+  if (!isPending(p)) return 'contrato quitado'
   if (p.nextDate) return `próximo pagamento em ${fmtDate(p.nextDate)}`
   if (p.nextSprint) return `próximo pagamento após a Sprint ${p.nextSprint}`
   return `próximo: ${p.nextDescription || 'parcela'} (data a definir)`
@@ -35,6 +44,49 @@ const ProductTag = ({ product }: { product: Project['product'] }) =>
     </span>
   ) : null
 
+/** Linha do card com o próximo pagamento e quanto falta. */
+function NextLine({ p }: { p: Project }) {
+  if (!isPending(p)) {
+    return (
+      <div style={{ fontSize: 12.5, color: 'var(--primary)', fontWeight: 600 }}>
+        Quitado
+        <span style={{ color: 'var(--mutedfg)', fontWeight: 400 }}>
+          {' '}
+          · {p.installmentCount} {p.installmentCount === 1 ? 'parcela paga' : 'parcelas pagas'}
+        </span>
+      </div>
+    )
+  }
+
+  const d = p.nextDate ? dueLabel(p.nextDate) : null
+  return (
+    <div style={{ fontSize: 12.5, color: 'var(--mutedfg)', lineHeight: 1.5 }}>
+      <div>
+        Próximo:{' '}
+        {d ? (
+          <>
+            <span className="num" style={{ color: 'var(--fg)', fontWeight: 600 }}>
+              {fmtDate(p.nextDate)}
+            </span>{' '}
+            <span style={{ color: d.tone }}>({d.label})</span>
+          </>
+        ) : p.nextSprint ? (
+          <span style={{ color: 'var(--amber)', fontWeight: 600 }}>após a Sprint {p.nextSprint}</span>
+        ) : (
+          <span style={{ color: 'var(--fg)' }}>{p.nextDescription || 'parcela'} · data a definir</span>
+        )}
+      </div>
+      <div>
+        Falta{' '}
+        <span className="num" style={{ color: 'var(--fg)', fontWeight: 600 }}>
+          {BRL(p.total - p.paid)}
+        </span>{' '}
+        · {p.paidCount} de {p.installmentCount} parcelas pagas
+      </div>
+    </div>
+  )
+}
+
 export function Projetos({
   desktop,
   projects,
@@ -46,20 +98,22 @@ export function Projetos({
   onUpdated: (p: Project) => void
   onToast: (title: string, body: string, tone?: string) => void
 }) {
-  const [tab, setTab] = useState<Tab>('execucao')
+  const [tab, setTab] = useState<Tab>('pendentes')
   const [openId, setOpenId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [parcelasId, setParcelasId] = useState<string | null>(null)
 
-  const running = projects.filter((p) => p.running)
-  const finished = projects.filter((p) => !p.running)
-  const shown = tab === 'execucao' ? running : finished
+  const pending = projects.filter(isPending).sort((a, b) => urgency(a).localeCompare(urgency(b)))
+  const settled = projects.filter((p) => !isPending(p)).sort((a, b) => a.name.localeCompare(b.name))
+  const shown = tab === 'pendentes' ? pending : settled
+  const overdue = pending.filter(isOverdue)
+  const owed = pending.reduce((acc, p) => acc + Math.round((p.total - p.paid) * 100), 0) / 100
   const open = projects.find((p) => p.id === openId) ?? null
   const editing = projects.find((p) => p.id === editId) ?? null
 
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: 'execucao', label: 'Em execução', count: running.length },
-    { key: 'finalizados', label: 'Finalizados', count: finished.length },
+    { key: 'pendentes', label: 'Pagamentos pendentes', count: pending.length },
+    { key: 'finalizados', label: 'Pagamentos finalizados', count: settled.length },
   ]
 
   return (
@@ -68,12 +122,22 @@ export function Projetos({
         Projetos
       </h1>
       <p style={{ margin: '8px 0 0', fontSize: 14, color: 'var(--mutedfg)' }}>
-        {running.length} em execução · {finished.length} finalizados
+        <span className="num">{BRL(owed)}</span> a receber em {pending.length}{' '}
+        {pending.length === 1 ? 'projeto' : 'projetos'}
+        {overdue.length > 0 && (
+          <>
+            {' · '}
+            <span style={{ color: 'var(--destructive)', fontWeight: 600 }}>
+              {overdue.length} com parcela vencida
+            </span>
+          </>
+        )}
       </p>
 
       <div
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           gap: 6,
           padding: 4,
           border: '1px solid var(--border)',
@@ -115,9 +179,7 @@ export function Projetos({
                   display: 'grid',
                   placeItems: 'center',
                   borderRadius: 99,
-                  background: active
-                    ? 'color-mix(in oklch,var(--primary) 18%,transparent)'
-                    : 'var(--muted)',
+                  background: active ? 'color-mix(in oklch,var(--primary) 18%,transparent)' : 'var(--muted)',
                   fontSize: 11.5,
                   fontWeight: 700,
                 }}
@@ -129,87 +191,112 @@ export function Projetos({
         })}
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: desktop ? 'repeat(3,minmax(0,1fr))' : '1fr',
-          gap: 14,
-          marginTop: 16,
-        }}
-      >
-        {shown.map((p) => (
-          <button
-            key={p.id}
-            className="card lift"
-            onClick={() => setOpenId(p.id)}
-            style={{ textAlign: 'left', padding: 18, cursor: 'pointer', color: 'var(--fg)', font: 'inherit' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
-              <span style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>
-                {p.name}
-              </span>
-              <ProductTag product={p.product} />
-            </div>
-            {p.client && (
-              <div className="truncate" style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 4 }}>
-                {p.client}
-              </div>
-            )}
-            <div
+      {shown.length === 0 ? (
+        <div style={{ marginTop: 16 }}>
+          <EmptyState
+            title={tab === 'pendentes' ? 'Nenhum pagamento pendente' : 'Nenhum contrato quitado ainda'}
+            body={
+              tab === 'pendentes'
+                ? 'Todos os projetos estão com as parcelas pagas.'
+                : 'Quando um projeto tiver todas as parcelas pagas, ele aparece aqui.'
+            }
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: desktop ? 'repeat(3,minmax(0,1fr))' : '1fr',
+            gap: 14,
+            marginTop: 16,
+          }}
+        >
+          {shown.map((p) => (
+            <button
+              key={p.id}
+              className="card lift"
+              onClick={() => setOpenId(p.id)}
               style={{
+                textAlign: 'left',
+                padding: 18,
+                cursor: 'pointer',
+                color: 'var(--fg)',
+                font: 'inherit',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-                marginTop: 8,
+                flexDirection: 'column',
+                borderColor: isOverdue(p) ? 'color-mix(in oklch,var(--destructive) 45%,var(--border))' : undefined,
               }}
             >
-              <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>
-                {p.po ? `P.O. ${p.po}` : 'P.O. a definir'}
-                {p.sprintCount > 0 && ` · Sprint ${p.lastValidatedSprint ?? 0}/${p.sprintCount}`}
-              </span>
-              <span
-                role="button"
-                tabIndex={0}
-                aria-label={`Editar ${p.name}`}
-                title="Editar projeto"
-                className="icon-btn"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setEditId(p.id)
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+                <span style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>
+                  {p.name}
+                </span>
+                <ProductTag product={p.product} />
+              </div>
+              {p.client && (
+                <div className="truncate" style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 4 }}>
+                  {p.client}
+                </div>
+              )}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginTop: 8,
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
+              >
+                <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>
+                  {p.po ? `P.O. ${p.po}` : 'P.O. a definir'}
+                  {p.sprintCount > 0 && ` · Sprint ${p.lastValidatedSprint ?? 0}/${p.sprintCount}`}
+                </span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Editar ${p.name}`}
+                  title="Editar projeto"
+                  className="icon-btn"
+                  onClick={(e) => {
                     e.stopPropagation()
                     setEditId(p.id)
-                  }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setEditId(p.id)
+                    }
+                  }}
+                  style={{ width: 28, height: 28, flex: 'none' }}
+                >
+                  <IconEdit size={15} />
+                </span>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <ProgressBar pct={pctOf(p)} height={8} />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginTop: 8,
                 }}
-                style={{ width: 28, height: 28, flex: 'none' }}
               >
-                <IconEdit size={15} />
-              </span>
-            </div>
-            <div style={{ marginTop: 14 }}>
-              <ProgressBar pct={pctOf(p)} height={8} />
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-                marginTop: 9,
-              }}
-            >
-              <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>{pctOf(p)} pago</span>
-              <span className="num" style={{ fontSize: 13, fontWeight: 600 }}>
-                {BRL(p.total)}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
+                <span style={{ fontSize: 12.5, color: 'var(--mutedfg)' }}>{pctOf(p)} pago</span>
+                <span className="num" style={{ fontSize: 13, fontWeight: 600 }}>
+                  {BRL(p.total)}
+                </span>
+              </div>
+              <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                <NextLine p={p} />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {open && (
         <ProjectDetail
@@ -260,7 +347,6 @@ function ProjectDetail({
   onEdit: () => void
   onParcelas: () => void
 }) {
-  const nf = p.nf
   const box = (label: string, value: string, accent?: boolean) => (
     <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
       <div style={{ fontSize: 11.5, color: 'var(--mutedfg)' }}>{label}</div>
@@ -277,6 +363,8 @@ function ProjectDetail({
       </div>
     </div>
   )
+
+  const d = p.nextDate ? dueLabel(p.nextDate) : null
 
   return (
     <Sheet open onClose={onClose} desktop={desktop} width={desktop ? 520 : 460} title={p.name} hideHeader>
@@ -303,16 +391,10 @@ function ProjectDetail({
             </div>
           )}
           <div style={{ fontSize: 13, color: 'var(--mutedfg)', marginTop: 4 }}>
-            P.O. (gerente):{' '}
-            <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.po || 'a definir'}</span>
+            P.O. (gerente): <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{p.po || 'a definir'}</span>
           </div>
         </div>
-        <button
-          className="icon-btn"
-          onClick={onClose}
-          aria-label="Fechar"
-          style={{ width: 32, height: 32, flex: 'none' }}
-        >
+        <button className="icon-btn" onClick={onClose} aria-label="Fechar" style={{ width: 32, height: 32, flex: 'none' }}>
           <IconClose />
         </button>
       </div>
@@ -369,52 +451,27 @@ function ProjectDetail({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 10,
             fontSize: 12.5,
             color: 'var(--mutedfg)',
           }}
         >
-          <span>{pctOf(p)} pago</span>
-          <span>{nextPayment(p)}</span>
+          <span>
+            {pctOf(p)} pago · {p.paidCount} de {p.installmentCount} parcelas
+          </span>
+          <span style={{ color: d?.tone }}>
+            {nextPayment(p)}
+            {d && ` (${d.label})`}
+          </span>
         </div>
         <div style={{ marginTop: 9 }}>
           <ProgressBar pct={pctOf(p)} />
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: 14,
-          borderRadius: 12,
-          background: 'var(--muted)',
-        }}
-      >
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600 }}>NF do próximo pagamento</div>
-          <div style={{ fontSize: 12.5, color: 'var(--mutedfg)', marginTop: 3 }}>
-            {p.nextNumber === null
-              ? 'Sem pagamentos pendentes'
-              : p.nextDate
-                ? `Vencimento em ${fmtDate(p.nextDate)}`
-                : p.nextSprint
-                  ? `Libera após a validação da Sprint ${p.nextSprint}`
-                  : `${p.nextDescription || 'Parcela'} · vencimento a definir`}
-          </div>
-        </div>
-        <span
-          className="chip"
-          style={{ flex: 'none', padding: '5px 11px', fontSize: 11.5, background: nfTone(nf)[0], color: nfTone(nf)[1] }}
-        >
-          {nf ? 'NF emitida' : 'Sem NF'}
-        </span>
-      </div>
-
       <div style={{ display: 'flex', gap: 10 }}>
         <button className="btn-ghost" onClick={onParcelas} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
-          {p.sprintCount > 0 ? 'Parcelas e sprints' : 'Ver parcelas'} ({p.paidCount}/{p.installmentCount} pagas)
+          {p.sprintCount > 0 ? 'Parcelas e sprints' : 'Ver parcelas'}
         </button>
         <button className="btn-primary" onClick={onEdit} style={{ flex: 1, height: 42, fontSize: 13.5 }}>
           <IconEdit />

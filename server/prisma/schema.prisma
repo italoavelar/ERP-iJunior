@@ -73,8 +73,8 @@ model Project {
   @@map("projects")
 }
 
-/// Parcela do plano de pagamento. O vencimento e a NF do "próximo pagamento"
-/// que as telas mostram saem daqui: é a primeira parcela ainda não paga.
+/// Parcela do plano de pagamento. O "próximo pagamento" que as telas mostram
+/// sai daqui: é a primeira parcela ainda não paga.
 model Installment {
   id        String @id @default(cuid())
   projectId String
@@ -91,8 +91,6 @@ model Installment {
   paidAt      DateTime? @db.Date
   /// Valor efetivamente recebido, quando difere do previsto.
   paidAmount  Decimal? @db.Decimal(12, 2)
-  /// NF desta parcela já emitida.
-  nfIssued    Boolean  @default(false)
   /// Sprint cuja validação libera a cobrança desta parcela.
   sprintNumber Int?
   notes       String   @default("")

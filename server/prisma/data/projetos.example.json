@@ -10,9 +10,30 @@
       "notes": "Parcelas mensais",
       "running": true,
       "installments": [
-        { "description": "Entrada", "amount": 1000, "dueDate": "2026-09-10", "paid": true, "paidAt": "2026-09-10", "nfIssued": true, "notes": "NF 1" },
-        { "description": "Parcela", "amount": 1000, "dueDate": "2026-10-10", "paid": false, "paidAt": null, "nfIssued": false, "notes": "" },
-        { "description": "Parcela", "amount": 1000, "dueDate": "2026-11-10", "paid": false, "paidAt": null, "nfIssued": false, "notes": "" }
+        {
+          "description": "Entrada",
+          "amount": 1000,
+          "dueDate": "2026-09-10",
+          "paid": true,
+          "paidAt": "2026-09-10",
+          "notes": "NF 1"
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-10-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        },
+        {
+          "description": "Parcela",
+          "amount": 1000,
+          "dueDate": "2026-11-10",
+          "paid": false,
+          "paidAt": null,
+          "notes": ""
+        }
       ]
     },
     {
@@ -23,10 +44,32 @@
       "po": "",
       "notes": "Paga após a validação das Sprints 2 e 4",
       "running": true,
-      "sprints": { "count": 4, "validated": [1, 2] },
+      "sprints": {
+        "count": 4,
+        "validated": [
+          1,
+          2
+        ]
+      },
       "installments": [
-        { "description": "Após Sprint 2", "amount": 1500, "dueDate": null, "paid": true, "paidAt": "2026-09-20", "nfIssued": true, "sprintNumber": 2, "notes": "" },
-        { "description": "Após Sprint 4", "amount": 1500, "dueDate": null, "paid": false, "paidAt": null, "nfIssued": false, "sprintNumber": 4, "notes": "" }
+        {
+          "description": "Após Sprint 2",
+          "amount": 1500,
+          "dueDate": null,
+          "paid": true,
+          "paidAt": "2026-09-20",
+          "sprintNumber": 2,
+          "notes": ""
+        },
+        {
+          "description": "Após Sprint 4",
+          "amount": 1500,
+          "dueDate": null,
+          "paid": false,
+          "paidAt": null,
+          "sprintNumber": 4,
+          "notes": ""
+        }
       ]
     }
   ]

@@ -1,9 +1,8 @@
 import { useState, type ReactNode } from 'react'
-import { IconCheckBox, IconMoon, IconNF, IconProjects, IconSun } from './components/Icons'
+import { IconCheckBox, IconMoon, IconProjects, IconSun } from './components/Icons'
 import { Toast } from './components/Toast'
 import { Atividades } from './screens/Atividades'
 import { Projetos } from './screens/Projetos'
-import { NotasFiscais } from './screens/NotasFiscais'
 import { ErrorState, Loading } from './components/primitives'
 import { api } from './lib/api'
 import { useAsync } from './hooks/useAsync'
@@ -12,18 +11,16 @@ import { useMediaQuery } from './hooks/useMediaQuery'
 import { useTheme } from './hooks/useTheme'
 import { useToast } from './hooks/useToast'
 
-type Screen = 'atividades' | 'projetos' | 'notas'
+type Screen = 'atividades' | 'projetos'
 
 const TITLES: Record<Screen, string> = {
   atividades: 'Atividades',
   projetos: 'Projetos',
-  notas: 'Notas fiscais',
 }
 
 const NAV: { key: Screen; label: string; icon: ReactNode }[] = [
   { key: 'atividades', label: 'Dashboard', icon: <IconCheckBox size={19} /> },
   { key: 'projetos', label: 'Projetos', icon: <IconProjects /> },
-  { key: 'notas', label: 'Notas fiscais', icon: <IconNF /> },
 ]
 
 export default function App() {
@@ -34,23 +31,13 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('atividades')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Projetos vivem aqui porque duas telas os compartilham: a tabela de NFs
-  // altera o mesmo registro que o detalhe do projeto exibe.
+  // Projetos carregam aqui para não recarregar a cada troca de tela.
   const projects = useAsync<Project[]>(() => api.projects.list())
 
-  /** Uma tela mexeu num projeto: reflete na lista que as duas compartilham. */
+  /** Uma edição devolveu o projeto atualizado: reflete na lista. */
   const applyProject = (updated: Project) =>
     projects.set((cur) => cur.map((p) => (p.id === updated.id ? updated : p)))
 
-  const toggleNF = async (id: string, issued: boolean) => {
-    try {
-      const updated = await api.projects.setNF(id, issued)
-      applyProject(updated)
-      show(issued ? 'NF marcada como emitida' : 'NF desmarcada', updated.name)
-    } catch (e) {
-      show('Não deu para atualizar', e instanceof Error ? e.message : String(e), 'var(--destructive)')
-    }
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--fg)', display: 'flex' }}>
@@ -249,15 +236,6 @@ export default function App() {
                   <Projetos
                     desktop={desktop}
                     projects={projects.data ?? []}
-                    onUpdated={applyProject}
-                    onToast={show}
-                  />
-                )}
-                {screen === 'notas' && (
-                  <NotasFiscais
-                    projects={projects.data ?? []}
-                    desktop={desktop}
-                    onToggle={toggleNF}
                     onUpdated={applyProject}
                     onToast={show}
                   />

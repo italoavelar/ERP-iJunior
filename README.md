@@ -51,9 +51,7 @@ Base: `http://localhost:3333`
 | GET | `/api/projects?status=running\|finished` | Lista projetos |
 | GET | `/api/projects/:id` | Detalhe do projeto, com o plano de parcelas |
 | PATCH | `/api/projects/:id` | Edita nome, descrição, P.O., produto e situação |
-| PATCH | `/api/projects/:id/nf` | Marca a NF da primeira parcela em aberto (`{ "issued": boolean }`) |
-| PATCH | `/api/projects/:id/installments/:number/nf` | Marca a NF de uma parcela específica |
-| PATCH | `/api/projects/:id/installments/:number` | Edita pagamento, NF ou valor da parcela |
+| PATCH | `/api/projects/:id/installments/:number` | Edita pagamento, data de pagamento, vencimento ou valor da parcela |
 | PUT | `/api/projects/:id/installments` | Refaz o plano: preço, nº de parcelas, 1º vencimento e pagas |
 | PATCH | `/api/projects/:id/sprints/:number` | Valida uma sprint (`{ "validated": boolean }`) e libera a cobrança das parcelas ligadas a ela |
 
@@ -77,8 +75,8 @@ Sem esse arquivo, o import usa `projetos.example.json`, com dados fictícios. A
 importação confere, antes de gravar, se as parcelas de cada projeto somam o
 total e o valor recebido esperados.
 
-Parcelas podem ficar sem vencimento quando dependem de um marco (NF, entrega,
-assinatura). Nos projetos pagos por sprint, a parcela aponta para a sprint que a
+Parcelas podem ficar sem vencimento quando dependem de um marco (entrega,
+assinatura, emissão da nota). Nos projetos pagos por sprint, a parcela aponta para a sprint que a
 libera: validar a sprint na tela de parcelas dá a ela o vencimento do dia.
 
 ## Scripts do servidor

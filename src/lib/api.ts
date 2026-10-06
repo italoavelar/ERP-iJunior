@@ -77,17 +77,6 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(input),
       }),
-    /** Atalho: NF da primeira parcela em aberto. */
-    setNF: (id: string, issued: boolean) =>
-      request<ProjectDetail>(`/api/projects/${id}/nf`, {
-        method: 'PATCH',
-        body: JSON.stringify({ issued }),
-      }),
-    setInstallmentNF: (id: string, number: number, issued: boolean) =>
-      request<ProjectDetail>(`/api/projects/${id}/installments/${number}/nf`, {
-        method: 'PATCH',
-        body: JSON.stringify({ issued }),
-      }),
     /** Refaz o plano: preço, número de parcelas, primeiro vencimento e pagas. */
     replan: (
       id: string,

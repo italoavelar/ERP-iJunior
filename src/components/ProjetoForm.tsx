@@ -212,7 +212,7 @@ export function ProjetoForm({
       </div>
 
       <p style={{ margin: 0, fontSize: 12.5, color: 'var(--mutedfg)', lineHeight: 1.5 }}>
-        Valor pago e NFs são editados no plano de parcelas — abra “Ver parcelas”.
+        Valores e pagamentos são editados no plano de parcelas — abra “Ver parcelas”.
       </p>
     </Sheet>
   )

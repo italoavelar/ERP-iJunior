@@ -24,14 +24,11 @@ const updateBody = z
   .partial()
   .refine((v) => Object.keys(v).length > 0, { message: 'Envie ao menos um campo.' })
 
-const nfBody = z.object({ issued: z.boolean() })
-
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida.')
 
 const installmentBody = z
   .object({
     paid: z.boolean(),
-    nfIssued: z.boolean(),
     amount: z.number().positive('O valor da parcela precisa ser maior que zero.'),
     dueDate: isoDate.nullable(),
     paidAt: isoDate.nullable(),
@@ -57,18 +54,7 @@ projectsRouter.patch('/:id', async (req, res) => {
   res.json(await service.updateProject(id, data))
 })
 
-/** Atalho: NF da primeira parcela em aberto. */
-projectsRouter.patch('/:id/nf', async (req, res) => {
-  const { id } = idParam.parse(req.params)
-  const { issued } = nfBody.parse(req.body)
-  res.json(await service.setNextNF(id, issued))
-})
 
-projectsRouter.patch('/:id/installments/:number/nf', async (req, res) => {
-  const { id, number } = installmentParams.parse(req.params)
-  const { issued } = nfBody.parse(req.body)
-  res.json(await service.setInstallmentNF(id, number, issued))
-})
 
 const replanBody = z
   .object({
@@ -108,7 +94,7 @@ projectsRouter.patch('/:id/sprints/:number', async (req, res) => {
   res.json(await service.setSprintValidated(id, number, validated, date))
 })
 
-/** Pagamento, NF, valor, vencimento ou descrição de uma parcela. */
+/** Pagamento, valor, vencimento ou descrição de uma parcela. */
 projectsRouter.patch('/:id/installments/:number', async (req, res) => {
   const { id, number } = installmentParams.parse(req.params)
   const data = installmentBody.parse(req.body)

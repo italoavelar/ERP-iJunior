@@ -30,7 +30,6 @@ export interface Installment {
   paidAt: string | null
   /** Valor efetivamente recebido, quando difere do previsto. */
   paidAmount: number | null
-  nfIssued: boolean
   /** Sprint cuja validação libera a cobrança. */
   sprintNumber: number | null
   notes: string
@@ -58,10 +57,6 @@ export interface Project {
   paid: number
   /** `YYYY-MM-DD`; null quando o contrato está quitado. */
   nextDate: string | null
-  /** NF do próximo pagamento já emitida. */
-  nf: boolean
-  /** Quantas parcelas já tiveram NF emitida. */
-  nfCount: number
   installmentCount: number
   /** Número da primeira parcela em aberto; null se o contrato está quitado. */
   nextNumber: number | null
@@ -90,7 +85,6 @@ export interface ProjectInput {
 
 export interface InstallmentPatch {
   paid?: boolean
-  nfIssued?: boolean
   amount?: number
   dueDate?: string | null
   paidAt?: string | null
