@@ -11,6 +11,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { PrismaClient } from '@prisma/client'
+import { databaseUrl } from './lib/databaseUrl.js'
 import { z } from 'zod'
 import './env.js'
 import { fromISODate } from './lib/serialize.js'
@@ -83,7 +84,7 @@ async function main() {
     }
   }
 
-  const prisma = new PrismaClient()
+  const prisma = new PrismaClient({ datasourceUrl: databaseUrl() })
   try {
     await prisma.$transaction(async (tx) => {
       for (const p of data.projects) {

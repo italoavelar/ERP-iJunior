@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client'
+import './env.js'
+import { databaseUrl } from './lib/databaseUrl.js'
 import { fromISODate } from './lib/serialize.js'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({ datasourceUrl: databaseUrl() })
 
 const PEOPLE = [
   { id: 'fs', name: 'Felipe Souza', initials: 'FS' },

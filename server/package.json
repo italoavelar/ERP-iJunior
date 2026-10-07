@@ -16,7 +16,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx src/seed.ts",
     "db:studio": "prisma studio",
-    "db:import": "tsx src/import-projects.ts"
+    "db:import": "tsx src/import-projects.ts",
+    "vercel-build": "node scripts/vercel-build.mjs"
   },
   "prisma": {
     "seed": "tsx src/seed.ts"

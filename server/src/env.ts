@@ -21,9 +21,19 @@ if (!parsed.success) {
   throw new Error(`Variáveis de ambiente inválidas:\n${issues}`)
 }
 
+/**
+ * Origens do CORS, separadas por vírgula. Um `*` vale qualquer trecho, o que
+ * cobre os previews da Vercel: `https://erp-ijunior-*.vercel.app`.
+ */
+const corsOrigin = (pattern: string): string | RegExp =>
+  pattern.includes('*')
+    ? new RegExp(`^${pattern.split('*').map((s) => s.replace(/[.+?^${}()|[\]\\/]/g, '\\$&')).join('[^/]*')}$`)
+    : pattern.replace(/\/+$/, '')
+
 export const env = {
   ...parsed.data,
   corsOrigins: parsed.data.CORS_ORIGIN.split(',')
     .map((s) => s.trim())
-    .filter(Boolean),
+    .filter(Boolean)
+    .map(corsOrigin),
 }

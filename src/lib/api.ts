@@ -8,7 +8,8 @@ import type {
   ProjectInput,
 } from './types'
 
-const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+// Barra no fim viraria "//api" na URL — tira, caso alguém cole o endereço com ela.
+const BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:3333').replace(/\/+$/, '')
 
 export interface ApiIssue {
   path: string
